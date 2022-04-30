@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/Boardpad-front'),
+      dir: require('path').join(__dirname, './coverage/boardpad-front'),
       subdir: '.',
       reporters: [
         { type: 'html' },
