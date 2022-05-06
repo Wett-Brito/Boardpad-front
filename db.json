@@ -1,5 +1,5 @@
 {
-  "categories": [
+  "status": [
     {
       "id": 1,
       "name": "todo - 1"
@@ -126,6 +126,20 @@
       "description": "Description",
       "category": "Frontend",
       "status": 5
+    }
+  ],
+  "categories" : [
+    {
+      "id" : 1,
+      "name" : "Frontend"
+    },
+    {
+      "id" : 2,
+      "name" : "API"
+    },
+    {
+      "id" : 3,
+      "name" : "Database"
     }
   ]
 }

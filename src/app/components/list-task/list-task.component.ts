@@ -1,8 +1,8 @@
+import { StatusTaskInterface } from './../../interfaces/status-task-interface';
 import { GroupedTasks } from './../../interfaces/grouped-tasks';
 import { StatusCategoryService } from './../../services/status-category.service';
 import { TaskService } from './../../services/task.service';
 import { TaskResponseInterface } from './../../interfaces/task-response-interface';
-import { StatusTaskInterface } from '../../interfaces/status-task-interface';
 import { Component, OnInit } from '@angular/core';
 import {
   CdkDragDrop,
@@ -20,6 +20,9 @@ export class ListTaskComponent implements OnInit {
   listTasks: TaskResponseInterface[] = [];
   listStatusCategories: StatusTaskInterface[] = [];
   groupedTasks: GroupedTasks[] = [];
+
+  showModalCreateTask : boolean = false;
+  selectedTaskStatus : StatusTaskInterface = {} as StatusTaskInterface;
 
   constructor(
     private taskService: TaskService,
@@ -121,5 +124,13 @@ export class ListTaskComponent implements OnInit {
         );
       } else alert('Erro ao mudar status da task');
     }
+  }
+
+  onClickCreateTasks(obj = {id : 0, name : ""} ) : void{
+    this.selectedTaskStatus = {
+      id : obj.id,
+      name : obj.name
+    };
+    this.showModalCreateTask = true;
   }
 }

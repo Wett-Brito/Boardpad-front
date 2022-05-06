@@ -13,6 +13,6 @@ export class StatusCategoryService {
   constructor(private httpClient : HttpClient) { }
 
   listAllStatusCategories() : Observable <StatusTaskInterface []> {
-    return this.httpClient.get(environment.urlBase + "/categories") as Observable <StatusTaskInterface []>;
+    return this.httpClient.get(environment.urlBase + "/status") as Observable <StatusTaskInterface []>;
   }
 }

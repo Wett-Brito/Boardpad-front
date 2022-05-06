@@ -1,4 +1,4 @@
-import { ListTaskModule } from './components/list-task/list-task.module';
+import { TasksModule } from './pages/tasks/tasks.module';
 import { NgModule } from '@angular/core';
 import {  HttpClientModule } from '@angular/common/http';
 
@@ -13,7 +13,7 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ListTaskModule,
+    TasksModule,
     HttpClientModule
   ],
   providers: [],
