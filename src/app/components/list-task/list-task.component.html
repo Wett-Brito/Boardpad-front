@@ -1,0 +1,12 @@
+<div class="board" cdkDropListGroup>
+  <ul class="status-task-container" *ngFor="let category of groupedTasks" cdkDropList [cdkDropListData]="category.tasks" (cdkDropListDropped)="onDropCard($event,category.id)">
+    <h2>{{category.name}}</h2>
+    <li class="task-card" *ngFor="let taskItem of category.tasks" cdkDrag [cdkDragData]="taskItem">
+      <h3 class="task-card-title">{{taskItem.title}}</h3>
+      <div class="task-card-category">{{taskItem.category}}</div>
+    </li>
+    <li class="task-card" >
+      <h3 class="task-card-title"> INSERT NEW</h3>
+    </li>
+  </ul>
+</div>

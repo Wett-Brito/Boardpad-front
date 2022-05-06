@@ -1,6 +1,8 @@
+import { ListTaskModule } from './components/list-task/list-task.module';
 import { NgModule } from '@angular/core';
+import {  HttpClientModule } from '@angular/common/http';
+
 import { BrowserModule } from '@angular/platform-browser';
-import {DragDropModule} from '@angular/cdk/drag-drop'
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
@@ -11,7 +13,8 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    DragDropModule
+    ListTaskModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
