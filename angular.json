@@ -80,6 +80,10 @@
               "browserTarget": "boardpad-front:build:development"
             }
           },
+          "options": {
+            "browserTarget": "boardpad-front:build",
+            "proxyConfig": "src/proxy.conf.json"
+          },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {

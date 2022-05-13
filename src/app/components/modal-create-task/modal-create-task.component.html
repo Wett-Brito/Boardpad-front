@@ -5,38 +5,38 @@
         <h2 class="modal-title">Criar nova tarefa</h2>
       </div>
       <div class="modal-body">
-        <div class="form-group">
+        <form class="form-group" (ngSubmit)="createTask ()">
           <!--title : string; -->
           <div class="form-group">
             <label for="inputTitle">Titulo</label>
-            <input type="text" class="form-control" id="inputTitle" placeholder="Insira o título da tarefa">
+            <input type="text" class="form-control" id="inputTitle" placeholder="Insira o título da tarefa" name="title" [(ngModel)]="taskForm.title">
           </div>
           <!--description : string; -->
           <div class="form-group">
             <label for="inputDescription">Descrição</label>
-            <input type="text" class="form-control" id="inputDescription" placeholder="Insira a descrição da tarefa">
+            <input type="text" class="form-control" id="inputDescription" placeholder="Insira a descrição da tarefa" name="description" [(ngModel)]="taskForm.description">
           </div>
           <!--category : string; -->
           <div class="form-group">
             <label for="inputCategory">Categoria</label>
-            <select type="text" class="form-control" id="inputCategory" placeholder="Insira a categoria da tarefa">
-              <option [value]="-1">Selecione uma categoria</option>
-              <option *ngFor="let category of listCategories" [value]="category">{{category.name}}</option>
+            <select type="text" class="form-control" id="inputCategory" placeholder="Insira a categoria da tarefa" name="category" [(ngModel)]="taskForm.idCategory">
+              <option [value]="0">Selecione uma categoria</option>
+              <option *ngFor="let category of listCategories" [value]="category.id">{{category.name}}</option>
             </select>
           </div>
           <!-- status : number; -->
           <div class="form-group">
             <label for="inputStatus">Status</label>
-            <input type="text" class="form-control " disabled id="inputStatus" [value]="taskStatus.name" >
+            <input type="text" class="form-control " disabled id="inputStatus" [value]="taskStatus.name">
           </div>
-        </div>
+          <button type="submit" class="btn btn-success mt-3 float-right">
+            Criar Tarefa
+          </button>
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" (click)="closeCreationModal()">
-          Close
-        </button>
-        <button type="button" class="btn btn-success">
-          Criar
+          Fechar
         </button>
       </div>
     </div>

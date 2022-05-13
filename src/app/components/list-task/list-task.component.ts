@@ -67,11 +67,12 @@ export class ListTaskComponent implements OnInit {
         id: categoryItem.id,
         name: categoryItem.name,
         tasks: this.listTasks.filter(
-          (taskItem) => taskItem.status === categoryItem.id
+          (taskItem) => taskItem.idStatus === categoryItem.id
         ),
       };
       arrayTest.push(newObject);
     });
+    console.log(arrayTest)
     this.groupedTasks.push(...arrayTest);
   }
 

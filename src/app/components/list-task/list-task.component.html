@@ -3,11 +3,11 @@
     <h2>{{category.name}}</h2>
     <li class="task-card" *ngFor="let taskItem of category.tasks" cdkDrag [cdkDragData]="taskItem">
       <h3 class="task-card-title">{{taskItem.title}}</h3>
-      <div class="task-card-category">{{taskItem.category}}</div>
+      <div class="task-card-category">{{taskItem.nameCategory}}</div>
     </li>
     <li class="task-card" (click)="onClickCreateTasks({id : category.id, name : category.name})" >
       <h3 class="task-card-title"> INSERT NEW</h3>
     </li>
   </ul>
 </div>
-<app-modal-create-task [(showCreationModal)]="showModalCreateTask" [taskStatus]="selectedTaskStatus"></app-modal-create-task>
+<app-modal-create-task (updateTaskList)="getAllTasks()" [(showCreationModal)]="showModalCreateTask" [taskStatus]="selectedTaskStatus"></app-modal-create-task>
