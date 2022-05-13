@@ -9,5 +9,14 @@
       <h3 class="task-card-title"> INSERT NEW</h3>
     </li>
   </ul>
+  <ul class="status-task-container">
+    <h2>Crie uma nova coluna de status</h2>
+    <div class="input-group mb-3">
+      <input id="new-status" (keyup)="onNewStatusNameChange($event)" type="text" class="form-control" placeholder="Nome do novo status" aria-label="Nome do novo status" aria-describedby="basic-addon2">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" (click)="createNewStatus()">Criar</button>
+      </div>
+    </div>
+  </ul>
 </div>
 <app-modal-create-task (updateTaskList)="getAllTasks()" [(showCreationModal)]="showModalCreateTask" [taskStatus]="selectedTaskStatus"></app-modal-create-task>

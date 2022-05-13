@@ -24,9 +24,11 @@ export class ListTaskComponent implements OnInit {
   showModalCreateTask : boolean = false;
   selectedTaskStatus : StatusTaskInterface = {} as StatusTaskInterface;
 
+  newStatusName : string = '';
+
   constructor(
     private taskService: TaskService,
-    private categoryService: StatusCategoryService
+    private statusService: StatusCategoryService
   ) {
     // this.getAllTasks();
     this.getAllStatus();
@@ -35,7 +37,7 @@ export class ListTaskComponent implements OnInit {
   ngOnInit(): void {}
 
   getAllStatus(): void {
-    this.categoryService.listAllStatusCategories().subscribe({
+    this.statusService.listAllStatusCategories().subscribe({
       next: (response) => (this.listStatusCategories = response),
       error: (err) => console.error(err),
       complete: () => {
@@ -82,7 +84,7 @@ export class ListTaskComponent implements OnInit {
   ): TaskResponseInterface {
     let updatedTask: TaskResponseInterface = {} as TaskResponseInterface;
     this.taskService
-      .updateTaskStatus(task, newIdStatus)
+      .updateTaskStatus(task.id, newIdStatus)
       .pipe(take(1))
       .subscribe({
         next: (response) => (updatedTask = response),
@@ -133,5 +135,15 @@ export class ListTaskComponent implements OnInit {
       name : obj.name
     };
     this.showModalCreateTask = true;
+  }
+
+  onNewStatusNameChange (event : any) : void {
+    this.newStatusName = event.target.value;
+  }
+  createNewStatus() : void{
+    this.statusService.createNewStatus(this.newStatusName).pipe(take(1)).subscribe({
+      next : response => this.getAllStatus(),
+      error : err => console.log(err)
+    });
   }
 }

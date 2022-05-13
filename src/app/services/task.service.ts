@@ -13,9 +13,8 @@ export class TaskService {
   listAllTasks() : Observable <TaskResponseInterface []> {
     return this.httpClient.get("/api/tasks") as Observable <TaskResponseInterface []>;
   }
-  updateTaskStatus (task : TaskResponseInterface, newStatusId : number) : Observable<TaskResponseInterface>{
-    task.idStatus = newStatusId;
-    return this.httpClient.put(`/api/tasks/${task.id}`, task) as Observable<TaskResponseInterface>;
+  updateTaskStatus (taskId : number, newStatusId : number) : Observable<TaskResponseInterface>{
+    return this.httpClient.put(`/api/tasks/${taskId}?newStatusId=${newStatusId}`, {}) as Observable<TaskResponseInterface>;
   }
 
   createTask (task : TaskResponseInterface) : Observable <TaskResponseInterface>{

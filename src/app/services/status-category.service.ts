@@ -14,4 +14,8 @@ export class StatusCategoryService {
   listAllStatusCategories() : Observable <StatusTaskInterface []> {
     return this.httpClient.get("/api/status") as Observable <StatusTaskInterface []>;
   }
+
+  createNewStatus (name : string) : Observable <any> {
+    return this.httpClient.post('/api/status', name);
+  }
 }
