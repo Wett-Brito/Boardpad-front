@@ -9,7 +9,8 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-import { Subscription, take } from 'rxjs';
+
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-list-task',
@@ -21,10 +22,22 @@ export class ListTaskComponent implements OnInit {
   listStatusCategories: StatusTaskInterface[] = [];
   groupedTasks: GroupedTasks[] = [];
 
-  showModalCreateTask : boolean = false;
-  selectedTaskStatus : StatusTaskInterface = {} as StatusTaskInterface;
+  showModalCreateTask: boolean = false;
 
-  newStatusName : string = '';
+  // Controle do Modal de Confirmação
+  showModalConfirmation: boolean = false;
+  dataModalConfirmation : any = {
+    method : () =>{},
+    data : {}
+  };
+  titleModalConfirmation = "";
+  textModalConfirmation = "";
+
+
+  progressNewStatus : boolean = false;
+  selectedTaskStatus: StatusTaskInterface = {} as StatusTaskInterface;
+
+  newStatusName: string = '';
 
   constructor(
     private taskService: TaskService,
@@ -63,7 +76,7 @@ export class ListTaskComponent implements OnInit {
   groupByCategory(): void {
     this.groupedTasks = [];
     let arrayTest: any[] = [];
-    if (this.listStatusCategories.length == 0) alert('erro');
+    if (this.listStatusCategories == null || this.listStatusCategories.length == 0) return;
     this.listStatusCategories.forEach((categoryItem, index, arr) => {
       let newObject: GroupedTasks = {
         id: categoryItem.id,
@@ -74,7 +87,7 @@ export class ListTaskComponent implements OnInit {
       };
       arrayTest.push(newObject);
     });
-    console.log(arrayTest)
+    console.log(arrayTest);
     this.groupedTasks.push(...arrayTest);
   }
 
@@ -129,21 +142,47 @@ export class ListTaskComponent implements OnInit {
     }
   }
 
-  onClickCreateTasks(obj = {id : 0, name : ""} ) : void{
+  onClickCreateTasks(obj = { id: 0, name: '' }): void {
     this.selectedTaskStatus = {
-      id : obj.id,
-      name : obj.name
+      id: obj.id,
+      name: obj.name,
     };
     this.showModalCreateTask = true;
   }
 
-  onNewStatusNameChange (event : any) : void {
-    this.newStatusName = event.target.value;
+  createNewStatus(): void {
+    this.progressNewStatus = true;
+    this.statusService
+      .createNewStatus(this.newStatusName)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          this.newStatusName = '';
+          this.getAllStatus();
+        },
+        error: (err) => console.log(err),
+        complete : () => this.progressNewStatus = false
+      });
   }
-  createNewStatus() : void{
-    this.statusService.createNewStatus(this.newStatusName).pipe(take(1)).subscribe({
-      next : response => this.getAllStatus(),
-      error : err => console.log(err)
-    });
+  deleteStatus = (idStatus: number) : void => {
+    this.progressNewStatus = true;
+    this.statusService
+      .deleteStatus(idStatus)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) =>  this.getAllStatus(),
+        error: (err) => console.log(err),
+        complete : () => this.progressNewStatus = false
+      });
   }
+  onClickDeleteStatus( status : GroupedTasks ) : void {
+    this.showModalConfirmation = true;
+    this.dataModalConfirmation = {
+      method : this.deleteStatus,
+      data : status.id
+    }
+    this.titleModalConfirmation = "Confirmar remoção"
+    this.textModalConfirmation = `Deletando este o status ${status.name} você também deletará todas as Tasks relacionada à ele`;
+  }
+
 }

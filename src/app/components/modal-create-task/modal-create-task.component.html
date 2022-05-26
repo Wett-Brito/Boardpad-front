@@ -19,10 +19,10 @@
           <!--category : string; -->
           <div class="form-group">
             <label for="inputCategory">Categoria</label>
-            <select type="text" class="form-control" id="inputCategory" placeholder="Insira a categoria da tarefa" name="category" [(ngModel)]="taskForm.idCategory">
-              <option [value]="0">Selecione uma categoria</option>
-              <option *ngFor="let category of listCategories" [value]="category.id">{{category.name}}</option>
-            </select>
+            <input type="text" class="form-control" id="inputCategory" placeholder="Insira a categoria da tarefa" name="category" [(ngModel)]="taskForm.idCategory">
+            <ul>
+              <li *ngFor="let category of listCategories" [value]="category.id">{{category.name}}</li>
+            </ul>
           </div>
           <!-- status : number; -->
           <div class="form-group">

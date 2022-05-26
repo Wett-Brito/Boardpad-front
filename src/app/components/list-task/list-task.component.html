@@ -1,6 +1,17 @@
+<app-modal-confirmation [(showModal)]="showModalConfirmation" [title]="titleModalConfirmation" [message]="textModalConfirmation" [onConfirmPressed]="dataModalConfirmation"></app-modal-confirmation>
 <div class="board" cdkDropListGroup>
   <ul class="status-task-container" *ngFor="let category of groupedTasks" cdkDropList [cdkDropListData]="category.tasks" (cdkDropListDropped)="onDropCard($event,category.id)">
-    <h2>{{category.name}}</h2>
+    <div class="row">
+      <div class="col col-10">
+        <h2>{{category.name}}</h2>
+      </div>
+      <div class="col col-1">
+        <span style="cursor: pointer;" (click)="onClickDeleteStatus(category)">
+          <mat-icon aria-hidden="false" aria-label="Example trash icon">delete</mat-icon>
+        </span>
+      </div>
+    </div>
+    <mat-progress-bar *ngIf="progressNewStatus" mode="indeterminate"></mat-progress-bar>
     <li class="task-card" *ngFor="let taskItem of category.tasks" cdkDrag [cdkDragData]="taskItem">
       <h3 class="task-card-title">{{taskItem.title}}</h3>
       <div class="task-card-category">{{taskItem.nameCategory}}</div>
@@ -9,14 +20,16 @@
       <h3 class="task-card-title"> INSERT NEW</h3>
     </li>
   </ul>
-  <ul class="status-task-container">
+  <ul class="status-task-container" id="create-new-status-container">
     <h2>Crie uma nova coluna de status</h2>
-    <div class="input-group mb-3">
-      <input id="new-status" (keyup)="onNewStatusNameChange($event)" type="text" class="form-control" placeholder="Nome do novo status" aria-label="Nome do novo status" aria-describedby="basic-addon2">
-      <div class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" (click)="createNewStatus()">Criar</button>
-      </div>
-    </div>
+    <p>Digite o novo nome e pressione (Enter) para criar o novo nome de status.</p>
+    <mat-progress-bar *ngIf="progressNewStatus" mode="indeterminate"></mat-progress-bar>
+    <form (submit)="createNewStatus()">
+        <mat-form-field id="new-status-name" appearance="fill">
+          <mat-label>Nome da nova coluna</mat-label>
+          <input name="newStatusName" autocomplete="off" type="text" matInput [(ngModel)]="newStatusName" placeholder="Ex: To Do">
+        </mat-form-field>
+    </form>
   </ul>
 </div>
 <app-modal-create-task (updateTaskList)="getAllTasks()" [(showCreationModal)]="showModalCreateTask" [taskStatus]="selectedTaskStatus"></app-modal-create-task>

@@ -18,4 +18,8 @@ export class StatusCategoryService {
   createNewStatus (name : string) : Observable <any> {
     return this.httpClient.post('/api/status', name);
   }
+
+  deleteStatus (idStatus : number ) : Observable <any> {
+    return this.httpClient.delete(`/api/status/${idStatus}`);
+  }
 }
