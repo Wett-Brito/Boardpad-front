@@ -13,4 +13,10 @@ export class CategoriesService {
   listAllCategories() : Observable<TaskCategoryResponseInterface[]> {
     return this.httpClient.get(`/api/category`) as Observable<TaskCategoryResponseInterface[]>;
   }
+  createCategory (name : string) :  Observable<TaskCategoryResponseInterface> {
+    return this.httpClient.post(`/api/category?newCategoryName=${name}`, {}) as Observable<TaskCategoryResponseInterface>;
+  }
+  removeCategory (id : number) :  Observable<any> {
+    return this.httpClient.delete(`/api/category/${id}`, {}) as Observable<any>;
+  }
 }

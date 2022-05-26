@@ -9,6 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDividerModule } from '@angular/material/divider';
 
 
 @NgModule({
@@ -24,7 +26,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     FormsModule,
     MatInputModule,
     MatProgressBarModule,
-    ModalConfirmationModule
+    ModalConfirmationModule,
+    MatChipsModule,
+    MatDividerModule
   ],
   exports : [ListTaskComponent]
 })

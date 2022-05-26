@@ -1,9 +1,11 @@
+import { TaskCategoryResponseInterface } from './../../interfaces/task-category-response-interface';
 import { StatusTaskInterface } from './../../interfaces/status-task-interface';
 import { GroupedTasks } from './../../interfaces/grouped-tasks';
 import { StatusCategoryService } from './../../services/status-category.service';
 import { TaskService } from './../../services/task.service';
 import { TaskResponseInterface } from './../../interfaces/task-response-interface';
 import { Component, OnInit } from '@angular/core';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {
   CdkDragDrop,
   moveItemInArray,
@@ -11,6 +13,8 @@ import {
 } from '@angular/cdk/drag-drop';
 
 import { take } from 'rxjs';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { CategoriesService } from 'src/app/services/categories.service';
 
 @Component({
   selector: 'app-list-task',
@@ -18,6 +22,9 @@ import { take } from 'rxjs';
   styleUrls: ['./list-task.component.css'],
 })
 export class ListTaskComponent implements OnInit {
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+
+  listCategories : TaskCategoryResponseInterface [] = [];
   listTasks: TaskResponseInterface[] = [];
   listStatusCategories: StatusTaskInterface[] = [];
   groupedTasks: GroupedTasks[] = [];
@@ -35,19 +42,29 @@ export class ListTaskComponent implements OnInit {
 
 
   progressNewStatus : boolean = false;
+  progressTags : boolean = false;
   selectedTaskStatus: StatusTaskInterface = {} as StatusTaskInterface;
 
   newStatusName: string = '';
+  newCategoryName : string = '';
 
   constructor(
     private taskService: TaskService,
-    private statusService: StatusCategoryService
+    private statusService: StatusCategoryService,
+    private categoryService : CategoriesService
   ) {
-    // this.getAllTasks();
-    this.getAllStatus();
+    this.refreshPage();
   }
 
   ngOnInit(): void {}
+
+  refreshPage () : void {
+    this.categoryService.listAllCategories().pipe(take(1)).subscribe({
+      next : response => this.listCategories = response,
+      error : err => console.log(err)
+    });
+    this.getAllStatus();
+  }
 
   getAllStatus(): void {
     this.statusService.listAllStatusCategories().subscribe({
@@ -160,9 +177,9 @@ export class ListTaskComponent implements OnInit {
           this.newStatusName = '';
           this.getAllStatus();
         },
-        error: (err) => console.log(err),
-        complete : () => this.progressNewStatus = false
+        error: (err) => console.log(err)
       });
+      this.progressNewStatus = false
   }
   deleteStatus = (idStatus: number) : void => {
     this.progressNewStatus = true;
@@ -171,9 +188,11 @@ export class ListTaskComponent implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: (response) =>  this.getAllStatus(),
-        error: (err) => console.log(err),
-        complete : () => this.progressNewStatus = false
+        error: (err) => {
+          if (err.status === 400) alert(err.error);
+        }
       });
+      this.progressNewStatus = false
   }
   onClickDeleteStatus( status : GroupedTasks ) : void {
     this.showModalConfirmation = true;
@@ -184,5 +203,21 @@ export class ListTaskComponent implements OnInit {
     this.titleModalConfirmation = "Confirmar remoção"
     this.textModalConfirmation = `Deletando este o status ${status.name} você também deletará todas as Tasks relacionada à ele`;
   }
-
+  addCategory () {
+    this.progressTags = true;
+    this.categoryService.createCategory(this.newCategoryName).pipe(take(1)).subscribe({
+      next : response => this.refreshPage(),
+      error : err => console.log(err)
+    })
+    this.newCategoryName = "";
+    this.progressTags = false
+  }
+  removeCategory (id : number) : void {
+    this.progressTags = true;
+    this.categoryService.removeCategory(id).pipe(take(1)).subscribe({
+      next : response => this.refreshPage(),
+      error : err => console.log(err)
+    })
+    this.progressTags = false
+  }
 }
