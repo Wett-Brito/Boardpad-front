@@ -7,9 +7,11 @@
 html, body {
   height: 100%;
 }
+p, h1, h2, h3, h4, h5, h6, div{
+  color : var(--font-default-color);
+}
 body {
   margin: 0;
   font-family: Andale Mono, monospace;
-  color : var(--font-default-color);
   background:var(--background-color);
 }

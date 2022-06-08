@@ -45,7 +45,6 @@ export class ListTaskComponent implements OnInit {
   progressTags : boolean = false;
   selectedTaskStatus: StatusTaskInterface = {} as StatusTaskInterface;
 
-  newStatusName: string = '';
   newCategoryName : string = '';
 
   constructor(
@@ -70,13 +69,7 @@ export class ListTaskComponent implements OnInit {
     this.statusService.listAllStatusCategories().subscribe({
       next: (response) => (this.listStatusCategories = response),
       error: (err) => console.error(err),
-      complete: () => {
-        this.taskService.listAllTasks().subscribe({
-          next: (response) => (this.listTasks = response),
-          error: (err) => console.log(err),
-          complete: () => this.groupByCategory(),
-        });
-      },
+      complete : () => this.getAllTasks()
     });
   }
 
@@ -167,14 +160,13 @@ export class ListTaskComponent implements OnInit {
     this.showModalCreateTask = true;
   }
 
-  createNewStatus(): void {
+  createNewStatus(newStatusName : string = "New status"): void {
     this.progressNewStatus = true;
     this.statusService
-      .createNewStatus(this.newStatusName)
+      .createNewStatus(newStatusName)
       .pipe(take(1))
       .subscribe({
         next: (response) => {
-          this.newStatusName = '';
           this.getAllStatus();
         },
         error: (err) => console.log(err)
@@ -201,7 +193,7 @@ export class ListTaskComponent implements OnInit {
       data : status.id
     }
     this.titleModalConfirmation = "Confirmar remoção"
-    this.textModalConfirmation = `Deletando este o status ${status.name} você também deletará todas as Tasks relacionada à ele`;
+    this.textModalConfirmation = `Deletando este o status "${status.name}" você também deletará todas as Tasks relacionada à ele`;
   }
   addCategory () {
     this.progressTags = true;
@@ -219,5 +211,17 @@ export class ListTaskComponent implements OnInit {
       error : err => console.log(err)
     })
     this.progressTags = false
+  }
+
+  updateStatusName(event : any, statusId : number){
+    event.preventDefault();
+    let newStatusName : string = event.target.value;
+
+    console.log(`Atualizar ID: ${statusId} com Nome: ${newStatusName}`)
+    this.statusService.updateStausName(statusId, newStatusName).pipe(take(1))
+    .subscribe({
+      next : response => this.refreshPage(),
+      error : err => console.log(err)
+    })
   }
 }

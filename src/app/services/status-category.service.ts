@@ -22,4 +22,8 @@ export class StatusCategoryService {
   deleteStatus (idStatus : number ) : Observable <any> {
     return this.httpClient.delete(`/api/status/${idStatus}`);
   }
+
+  updateStausName (idStatus : number, newName : string) : Observable<any>{
+    return this.httpClient.put(`/api/status/${idStatus}?new-name=${newName}`, {});
+  }
 }

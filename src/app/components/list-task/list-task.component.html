@@ -1,11 +1,11 @@
 <app-modal-confirmation [(showModal)]="showModalConfirmation" [title]="titleModalConfirmation"
   [message]="textModalConfirmation" [onConfirmPressed]="dataModalConfirmation"></app-modal-confirmation>
-<div class="board" cdkDropListGroup>
+<div class="board" cdkDropListGroup *ngIf="listStatusCategories">
   <ul class="status-task-container" *ngFor="let category of groupedTasks" cdkDropList [cdkDropListData]="category.tasks"
     (cdkDropListDropped)="onDropCard($event,category.id)">
     <div class="row">
-      <div class="col col-10">
-        <h2>{{category.name}}</h2>
+      <div class="col col-10 ">
+        <input class="status-name" [value]="category.name" (blur)="updateStatusName($event, category.id)">
       </div>
       <div class="col col-1">
         <span style="cursor: pointer;" (click)="onClickDeleteStatus(category)">
@@ -13,51 +13,26 @@
         </span>
       </div>
     </div>
-    <mat-progress-bar *ngIf="progressNewStatus" mode="indeterminate"></mat-progress-bar>
+    <li class="task-card-create" (click)="onClickCreateTasks({id : category.id, name : category.name})">
+      <p ><span>+ </span>New</p>
+    </li>
     <li class="task-card" *ngFor="let taskItem of category.tasks" cdkDrag [cdkDragData]="taskItem">
       <h3 class="task-card-title">{{taskItem.title}}</h3>
-      <div class="task-card-category">{{taskItem.nameCategory}}</div>
-    </li>
-    <li class="task-card" (click)="onClickCreateTasks({id : category.id, name : category.name})">
-      <h3 class="task-card-title"> INSERT NEW</h3>
     </li>
   </ul>
-  <ul class="status-task-container" id="create-new-status-container">
-    <div class="">
-      <h2>Crie uma nova coluna de status</h2>
-      <p>Digite o nome da nova coluna de status e pressione (Enter) para criar.</p>
-      <mat-progress-bar *ngIf="progressNewStatus" mode="indeterminate"></mat-progress-bar>
-      <form (submit)="createNewStatus()">
-        <mat-form-field id="new-status-name" appearance="fill">
-          <mat-label>Nome da nova coluna</mat-label>
-          <input name="newStatusName" autocomplete="off" type="text" matInput [(ngModel)]="newStatusName"
-            placeholder="Ex: To Do">
-        </mat-form-field>
-      </form>
-    </div>
-    <mat-divider></mat-divider>
-    <div class="mt-3">
-      <h2>Crie tags/categorias personalizadas</h2>
-      <p>Digite o nome da nova categoria e pressione (Enter) para criar.</p>
-      <mat-progress-bar *ngIf="progressTags" mode="indeterminate"></mat-progress-bar>
-      <form (submit)="addCategory()">
-        <mat-chip-list #chipList aria-label="Fruit selection">
-          <mat-chip *ngFor="let category of listCategories" (removed)="removeCategory(category.id)">
-            {{category.name}}
-            <button matChipRemove>
-              <mat-icon>cancel</mat-icon>
-            </button>
-          </mat-chip>
-        </mat-chip-list>
-        <div class="mt-3">
-          <mat-form-field id="new-status-name" appearance="fill">
-            <mat-label>Nome da nova categoria</mat-label>
-            <input name="newStatusName" autocomplete="off" type="text" matInput [(ngModel)]="newCategoryName"
-              placeholder="Ex: Frontend">
-          </mat-form-field>
-        </div>
-      </form>
-    </div>
+  <ul id="create-new-status-icon-test">
+    <span *ngIf="progressNewStatus == false" tabindex="0" data-toggle="tooltip" title="Criar status">
+      <button (click)="createNewStatus()">+</button>
+    </span>
+    <span *ngIf="progressNewStatus" tabindex="0" data-toggle="tooltip" title="Criar status">
+      <mat-spinner diameter="20"></mat-spinner>
+    </span>
+
   </ul>
-  <app-modal-create-task (updateTaskList)="getAllTasks()" [(showCreationModal)]="showModalCreateTask"
+  <app-modal-create-task (updateTaskList)="refreshPage()" [(showCreationModal)]="showModalCreateTask"
     [taskStatus]="selectedTaskStatus"></app-modal-create-task>
+</div>
+<div *ngIf="!listStatusCategories" id="empty-board">
+  <h1>Crie sua primeira coluna de status</h1>
+  <button class="btn btn-success" (click)="createNewStatus()">Criar status</button>
+</div>
