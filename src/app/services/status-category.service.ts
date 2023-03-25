@@ -9,21 +9,40 @@ import { Observable } from 'rxjs';
 })
 export class StatusCategoryService {
 
-  constructor(private httpClient : HttpClient) { }
+  constructor(private httpClient: HttpClient) { }
 
-  listAllStatusCategories() : Observable <StatusTaskInterface []> {
-    return this.httpClient.get("/api/status") as Observable <StatusTaskInterface []>;
+  listAllStatusCategories(boardCode: string = ''): Observable<StatusTaskInterface[]> {
+    return this.httpClient.get("/api/status", {
+      params: {
+        "board-code": boardCode
+      }
+    }) as Observable<StatusTaskInterface[]>;
   }
 
-  createNewStatus (name : string) : Observable <any> {
-    return this.httpClient.post('/api/status', name);
+  createNewStatus(name: string, boardCode: string): Observable<any> {
+
+    return this.httpClient.post('/api/status', name, {
+      params: {
+        "board-code": boardCode,
+        "new-status-name" : name
+      }
+    });
   }
 
-  deleteStatus (idStatus : number ) : Observable <any> {
-    return this.httpClient.delete(`/api/status/${idStatus}`);
+  deleteStatus(idStatus: number, boardCode: string): Observable<any> {
+    return this.httpClient.delete(`/api/status/${idStatus}`, {
+      params: {
+        "board-code": boardCode
+      }
+    });
   }
 
-  updateStausName (idStatus : number, newName : string) : Observable<any>{
-    return this.httpClient.put(`/api/status/${idStatus}?new-name=${newName}`, {});
+  updateStausName(idStatus: number, newName: string, boardCode: string): Observable<any> {
+    return this.httpClient.put(`/api/status/${idStatus}/`, {}, {
+      params: {
+        "board-code": boardCode,
+        "new-name": newName
+      }
+    });
   }
 }

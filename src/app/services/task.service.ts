@@ -10,14 +10,27 @@ export class TaskService {
 
   constructor(private httpClient : HttpClient) { }
 
-  listAllTasks() : Observable <TaskResponseInterface []> {
-    return this.httpClient.get("/api/tasks") as Observable <TaskResponseInterface []>;
+  listAllTasks(boardCode = "board-test") : Observable <TaskResponseInterface []> {
+    return this.httpClient.get("/api/tasks", {
+      params: {
+        "board-code": boardCode
+      }
+    }) as Observable <TaskResponseInterface []>;
   }
-  updateTaskStatus (taskId : number, newStatusId : number) : Observable<TaskResponseInterface>{
-    return this.httpClient.put(`/api/tasks/${taskId}?newStatusId=${newStatusId}`, {}) as Observable<TaskResponseInterface>;
+  updateTaskStatus (taskId : number, newStatusId : number, boardCode : string) : Observable<TaskResponseInterface>{
+    return this.httpClient.put(`/api/tasks/${taskId}/status`, {}, {
+      params: {
+        "board-code": boardCode,
+        "new-status-id" : newStatusId
+      }
+    }) as Observable<TaskResponseInterface>;
   }
 
-  createTask (task : TaskResponseInterface) : Observable <TaskResponseInterface>{
-    return this.httpClient.post(`/api/tasks`, task) as Observable<TaskResponseInterface>;
+  createTask (task : TaskResponseInterface, boardCode : string) : Observable <TaskResponseInterface>{
+    return this.httpClient.post(`/api/tasks`, task, {
+      params: {
+        "board-code": boardCode
+      }
+    }) as Observable<TaskResponseInterface>;
   }
 }

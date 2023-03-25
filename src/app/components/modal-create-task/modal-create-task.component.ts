@@ -14,6 +14,8 @@ import { NgForm } from '@angular/forms';
 })
 export class ModalCreateTaskComponent implements OnInit {
   @Input()
+  boardCode = "";
+  @Input()
   taskStatus : StatusTaskInterface = {} as StatusTaskInterface;
   @Input()
   showCreationModal : boolean = false;
@@ -38,16 +40,18 @@ export class ModalCreateTaskComponent implements OnInit {
   }
 
   getAllCategories() :void {
-    this.categoryService.listAllCategories().pipe(take(1)).subscribe({
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
+    this.categoryService.listAllCategories(this.boardCode).pipe(take(1)).subscribe({
       next : response => this.listCategories = response,
-      error : err => console.log(err)
+      error : err => (err.status != 404) && console.log(err)
     })
   }
 
   createTask () : void {
     console.log(this.taskForm);
     this.taskForm.idStatus = this.taskStatus.id;
-    this.taskService.createTask(this.taskForm).pipe(take(1)).subscribe({
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
+    this.taskService.createTask(this.taskForm, this.boardCode).pipe(take(1)).subscribe({
       next : response => {
         this.updateTaskList.emit(1);
         this.closeCreationModal();

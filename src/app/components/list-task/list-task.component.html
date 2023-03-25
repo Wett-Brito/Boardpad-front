@@ -29,10 +29,10 @@
     </span>
 
   </ul>
-  <app-modal-create-task (updateTaskList)="refreshPage()" [(showCreationModal)]="showModalCreateTask"
+  <app-modal-create-task [boardCode]="boardCode" (updateTaskList)="refreshPage()" [(showCreationModal)]="showModalCreateTask"
     [taskStatus]="selectedTaskStatus"></app-modal-create-task>
 </div>
-<div *ngIf="!listStatusCategories" id="empty-board">
+<div *ngIf="listStatusCategories.length == 0" id="empty-board">
   <h1>Crie sua primeira coluna de status</h1>
   <button class="btn btn-success" (click)="createNewStatus()">Criar status</button>
 </div>

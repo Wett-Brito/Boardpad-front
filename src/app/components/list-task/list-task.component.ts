@@ -4,7 +4,7 @@ import { GroupedTasks } from './../../interfaces/grouped-tasks';
 import { StatusCategoryService } from './../../services/status-category.service';
 import { TaskService } from './../../services/task.service';
 import { TaskResponseInterface } from './../../interfaces/task-response-interface';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {
   CdkDragDrop,
@@ -15,6 +15,7 @@ import {
 import { take } from 'rxjs';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { CategoriesService } from 'src/app/services/categories.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-list-task',
@@ -24,6 +25,7 @@ import { CategoriesService } from 'src/app/services/categories.service';
 export class ListTaskComponent implements OnInit {
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
+  boardCode : string = "";
   listCategories : TaskCategoryResponseInterface [] = [];
   listTasks: TaskResponseInterface[] = [];
   listStatusCategories: StatusTaskInterface[] = [];
@@ -50,36 +52,42 @@ export class ListTaskComponent implements OnInit {
   constructor(
     private taskService: TaskService,
     private statusService: StatusCategoryService,
-    private categoryService : CategoriesService
+    private categoryService : CategoriesService,
+    private route : ActivatedRoute
   ) {
+    const routeParams = this.route.snapshot.paramMap;
+    this.boardCode = routeParams.get('board-code') || "";
     this.refreshPage();
   }
 
   ngOnInit(): void {}
 
   refreshPage () : void {
-    this.categoryService.listAllCategories().pipe(take(1)).subscribe({
-      next : response => this.listCategories = response,
-      error : err => console.log(err)
-    });
     this.getAllStatus();
+    this.categoryService.listAllCategories(this.boardCode).pipe(take(1)).subscribe({
+      next : response => this.listCategories = response,
+      error : err => (err.status != 404) && console.log(err)
+    });
   }
 
   getAllStatus(): void {
-    this.statusService.listAllStatusCategories().subscribe({
+    console.log("Teste -> ", this.boardCode)
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
+    this.statusService.listAllStatusCategories(this.boardCode).subscribe({
       next: (response) => (this.listStatusCategories = response),
-      error: (err) => console.error(err),
+      error: (err) => (err.status != 404 ) && console.error(err),
       complete : () => this.getAllTasks()
     });
   }
 
   getAllTasks(): void {
-    this.taskService.listAllTasks().subscribe({
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
+    this.taskService.listAllTasks(this.boardCode).subscribe({
       next: (response) => {
         this.listTasks = response;
         this.groupByCategory();
       },
-      error: (err) => console.log(err),
+      error: (err) =>  (err.status != 404 ) && console.error(err),
     });
   }
 
@@ -106,8 +114,9 @@ export class ListTaskComponent implements OnInit {
     newIdStatus: number
   ): TaskResponseInterface {
     let updatedTask: TaskResponseInterface = {} as TaskResponseInterface;
+    if (this.boardCode == null || this.boardCode.length == 0)  return {} as TaskResponseInterface;
     this.taskService
-      .updateTaskStatus(task.id, newIdStatus)
+      .updateTaskStatus(task.id, newIdStatus, this.boardCode)
       .pipe(take(1))
       .subscribe({
         next: (response) => (updatedTask = response),
@@ -161,9 +170,10 @@ export class ListTaskComponent implements OnInit {
   }
 
   createNewStatus(newStatusName : string = "New status"): void {
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.progressNewStatus = true;
     this.statusService
-      .createNewStatus(newStatusName)
+      .createNewStatus(newStatusName, this.boardCode)
       .pipe(take(1))
       .subscribe({
         next: (response) => {
@@ -174,14 +184,16 @@ export class ListTaskComponent implements OnInit {
       this.progressNewStatus = false
   }
   deleteStatus = (idStatus: number) : void => {
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.progressNewStatus = true;
     this.statusService
-      .deleteStatus(idStatus)
+      .deleteStatus(idStatus,this.boardCode)
       .pipe(take(1))
       .subscribe({
         next: (response) =>  this.getAllStatus(),
         error: (err) => {
-          if (err.status === 400) alert(err.error);
+          if (err.status === 404) alert(err.error);
+          else if (err.status != 404 ) console.error(err);
         }
       });
       this.progressNewStatus = false
@@ -197,7 +209,8 @@ export class ListTaskComponent implements OnInit {
   }
   addCategory () {
     this.progressTags = true;
-    this.categoryService.createCategory(this.newCategoryName).pipe(take(1)).subscribe({
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
+    this.categoryService.createCategory(this.newCategoryName, this.boardCode).pipe(take(1)).subscribe({
       next : response => this.refreshPage(),
       error : err => console.log(err)
     })
@@ -205,8 +218,9 @@ export class ListTaskComponent implements OnInit {
     this.progressTags = false
   }
   removeCategory (id : number) : void {
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.progressTags = true;
-    this.categoryService.removeCategory(id).pipe(take(1)).subscribe({
+    this.categoryService.removeCategory(id, this.boardCode).pipe(take(1)).subscribe({
       next : response => this.refreshPage(),
       error : err => console.log(err)
     })
@@ -215,10 +229,12 @@ export class ListTaskComponent implements OnInit {
 
   updateStatusName(event : any, statusId : number){
     event.preventDefault();
+    
+    if (this.boardCode == null || this.boardCode.length == 0)  return;
     let newStatusName : string = event.target.value;
-
+    
     console.log(`Atualizar ID: ${statusId} com Nome: ${newStatusName}`)
-    this.statusService.updateStausName(statusId, newStatusName).pipe(take(1))
+    this.statusService.updateStausName(statusId, newStatusName, this.boardCode).pipe(take(1))
     .subscribe({
       next : response => this.refreshPage(),
       error : err => console.log(err)
