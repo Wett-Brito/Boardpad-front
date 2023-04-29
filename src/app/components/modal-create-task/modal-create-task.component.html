@@ -17,7 +17,7 @@
             <input type="text" class="form-control" id="inputDescription" placeholder="Insira a descrição da tarefa" name="description" [(ngModel)]="taskForm.description">
           </div>
           <!--category : string; -->
-          <div class="form-group">
+          <div class="form-group" *ngIf="listCategories.length > 0">
             <label for="inputCategory">Categoria</label>
             <input type="text" class="form-control" id="inputCategory" placeholder="Insira a categoria da tarefa" name="category" [(ngModel)]="taskForm.idCategory">
             <ul>

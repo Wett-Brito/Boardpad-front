@@ -16,6 +16,7 @@ import { take } from 'rxjs';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { CategoriesService } from 'src/app/services/categories.service';
 import { ActivatedRoute } from '@angular/router';
+import { BoardService } from 'src/app/services/board.service';
 
 @Component({
   selector: 'app-list-task',
@@ -53,30 +54,55 @@ export class ListTaskComponent implements OnInit {
     private taskService: TaskService,
     private statusService: StatusCategoryService,
     private categoryService : CategoriesService,
-    private route : ActivatedRoute
+    private route : ActivatedRoute,
+    private boardService : BoardService
   ) {
     const routeParams = this.route.snapshot.paramMap;
     this.boardCode = routeParams.get('board-code') || "";
+
     this.refreshPage();
   }
 
   ngOnInit(): void {}
 
   refreshPage () : void {
+    this.getOrCreateBoard();
     this.getAllStatus();
     this.categoryService.listAllCategories(this.boardCode).pipe(take(1)).subscribe({
       next : response => this.listCategories = response,
       error : err => (err.status != 404) && console.log(err)
     });
   }
+  
+  getOrCreateBoard () : void {
+    this.boardService.getBoardIfExists(this.boardCode).pipe(take(1)).subscribe({
+      error : err => {
+        if(err.status == 404) {
+          this.boardService.createBoard(this.boardCode).pipe(take(1)).subscribe({
+            error : err => {
+              console.error(`Erro ao tentar criar o board [${this.boardCode}]`, err);
+              alert(`Erro ao tentar criar o board [${this.boardCode}]`);
+            }
+          });
+        }
+      }
+    })
+  }
 
   getAllStatus(): void {
-    console.log("Teste -> ", this.boardCode)
     if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.statusService.listAllStatusCategories(this.boardCode).subscribe({
-      next: (response) => (this.listStatusCategories = response),
-      error: (err) => (err.status != 404 ) && console.error(err),
-      complete : () => this.getAllTasks()
+      next: (response) => {
+        this.listStatusCategories = response;
+        this.getAllTasks();
+      },
+      error: (err) => {
+        if (err.status != 404 ) console.error(err)
+        else {
+          this.listStatusCategories = [];
+          this.getAllTasks();
+        };
+      }
     });
   }
 
@@ -87,7 +113,13 @@ export class ListTaskComponent implements OnInit {
         this.listTasks = response;
         this.groupByCategory();
       },
-      error: (err) =>  (err.status != 404 ) && console.error(err),
+      error: (err) =>  {
+        if (err.status != 404 ) console.error(err)
+        else {
+          this.listTasks = []
+          this.groupByCategory();
+        };
+      }
     });
   }
 
@@ -101,11 +133,10 @@ export class ListTaskComponent implements OnInit {
         name: categoryItem.name,
         tasks: this.listTasks.filter(
           (taskItem) => taskItem.idStatus === categoryItem.id
-        ),
+        ) || [],
       };
       arrayTest.push(newObject);
     });
-    console.log(arrayTest);
     this.groupedTasks.push(...arrayTest);
   }
 
@@ -232,12 +263,10 @@ export class ListTaskComponent implements OnInit {
     
     if (this.boardCode == null || this.boardCode.length == 0)  return;
     let newStatusName : string = event.target.value;
-    
-    console.log(`Atualizar ID: ${statusId} com Nome: ${newStatusName}`)
     this.statusService.updateStausName(statusId, newStatusName, this.boardCode).pipe(take(1))
     .subscribe({
       next : response => this.refreshPage(),
-      error : err => console.log(err)
+      error : err => console.error(err)
     })
   }
 }

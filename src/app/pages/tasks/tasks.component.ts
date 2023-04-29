@@ -8,13 +8,11 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class TasksComponent implements OnInit {
   showCreationModal: boolean = false;
-  boardCode : string = "";
 
   constructor(private route: ActivatedRoute) {}
   
   ngOnInit(): void {
     const routeParams = this.route.snapshot.paramMap;
-    this.boardCode = routeParams.get('board-code') || "";
   }
   openCreationModal(): void {
     this.showCreationModal = true;

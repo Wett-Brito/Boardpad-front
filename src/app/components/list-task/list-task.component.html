@@ -1,6 +1,6 @@
-<app-modal-confirmation [(showModal)]="showModalConfirmation" [title]="titleModalConfirmation"
-  [message]="textModalConfirmation" [onConfirmPressed]="dataModalConfirmation"></app-modal-confirmation>
 <div class="board" cdkDropListGroup *ngIf="listStatusCategories">
+  <app-modal-confirmation [(showModal)]="showModalConfirmation" [title]="titleModalConfirmation"
+    [message]="textModalConfirmation" [onConfirmPressed]="dataModalConfirmation"></app-modal-confirmation>
   <ul class="status-task-container" *ngFor="let category of groupedTasks" cdkDropList [cdkDropListData]="category.tasks"
     (cdkDropListDropped)="onDropCard($event,category.id)">
     <div class="row">
@@ -14,14 +14,14 @@
       </div>
     </div>
     <li class="task-card-create" (click)="onClickCreateTasks({id : category.id, name : category.name})">
-      <p ><span>+ </span>New</p>
+      <p><span>+ </span>New</p>
     </li>
     <li class="task-card" *ngFor="let taskItem of category.tasks" cdkDrag [cdkDragData]="taskItem">
       <h3 class="task-card-title">{{taskItem.title}}</h3>
     </li>
   </ul>
   <ul id="create-new-status-icon-test">
-    <span *ngIf="progressNewStatus == false" tabindex="0" data-toggle="tooltip" title="Criar status">
+    <span *ngIf="progressNewStatus == false && listStatusCategories.length > 0 " tabindex="0" data-toggle="tooltip" title="Criar status">
       <button (click)="createNewStatus()">+</button>
     </span>
     <span *ngIf="progressNewStatus" tabindex="0" data-toggle="tooltip" title="Criar status">
@@ -29,8 +29,8 @@
     </span>
 
   </ul>
-  <app-modal-create-task [boardCode]="boardCode" (updateTaskList)="refreshPage()" [(showCreationModal)]="showModalCreateTask"
-    [taskStatus]="selectedTaskStatus"></app-modal-create-task>
+  <app-modal-create-task [boardCode]="boardCode" (updateTaskList)="refreshPage()" [listCategories]="listCategories"
+    [(showCreationModal)]="showModalCreateTask" [taskStatus]="selectedTaskStatus"></app-modal-create-task>
 </div>
 <div *ngIf="listStatusCategories.length == 0" id="empty-board">
   <h1>Crie sua primeira coluna de status</h1>

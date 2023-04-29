@@ -23,9 +23,10 @@ export class ModalCreateTaskComponent implements OnInit {
   showCreationModalChange = new EventEmitter<boolean>();
   @Output()
   updateTaskList = new EventEmitter();
+  @Input()
+  listCategories : TaskCategoryResponseInterface [] = [];
 
   taskForm : TaskResponseInterface = {} as TaskResponseInterface;
-  listCategories : TaskCategoryResponseInterface [] = [];
 
   constructor(private categoryService : CategoriesService, private taskService : TaskService ) {
     this.taskForm.idCategory = 0;

@@ -12,4 +12,8 @@ export class BoardService {
   createBoard (name : string ) : Observable <any> {
     return this.httpClient.post(`/api/board/${name || 'random'}`, {}) as Observable <any>;
   }
+
+  getBoardIfExists(boardCode : string) : Observable<any> {
+    return this.httpClient.get(`/api/board/${boardCode}`, {}) as Observable <any>;
+  }
 }
