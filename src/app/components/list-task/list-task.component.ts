@@ -69,7 +69,7 @@ export class ListTaskComponent implements OnInit {
     this.getOrCreateBoard();
     this.getAllStatus();
     this.categoryService.listAllCategories(this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.listCategories = response,
+      next : response => this.listCategories = response.response,
       error : err => (err.status != 404) && console.log(err)
     });
   }

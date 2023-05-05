@@ -43,7 +43,9 @@ export class ModalCreateTaskComponent implements OnInit {
   getAllCategories() :void {
     if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.categoryService.listAllCategories(this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.listCategories = response,
+      next : response => {
+        this.listCategories = response.response;
+      },
       error : err => (err.status != 404) && console.log(err)
     })
   }

@@ -10,8 +10,8 @@ export class CategoriesService {
 
   constructor(private httpClient: HttpClient) { }
 
-  listAllCategories(boardCode: string): Observable<TaskCategoryResponseInterface[]> {
-    return this.httpClient.get(`/api/category`, { params: { "board-code": boardCode } }) as Observable<TaskCategoryResponseInterface[]>;
+  listAllCategories(boardCode: string): Observable<{message : string, status : string, response : TaskCategoryResponseInterface[]}> {
+    return this.httpClient.get(`/api/category`, { params: { "board-code": boardCode } }) as Observable<{message : string, status : string, response : TaskCategoryResponseInterface[]}>;
   }
   createCategory(name: string, boardCode: string): Observable<TaskCategoryResponseInterface> {
     return this.httpClient.post(`/api/category`, {}, { params: { "newCategoryName": name, "board-code": boardCode } }) as Observable<TaskCategoryResponseInterface>;
