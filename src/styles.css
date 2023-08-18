@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+
+*{
+  --background-color : #BBF;
+  --font-default-color : #555;
+}
+html, body {
+  height: 100%;
+}
+p, h1, h2, h3, h4, h5, h6, div{
+  color : var(--font-default-color);
+}
+body {
+  margin: 0;
+  font-family: Andale Mono, monospace;
+  background:var(--background-color);
+}

@@ -1,0 +1,38 @@
+<div class="board" cdkDropListGroup *ngIf="listStatusCategories">
+  <app-modal-confirmation [(showModal)]="showModalConfirmation" [title]="titleModalConfirmation"
+    [message]="textModalConfirmation" [onConfirmPressed]="dataModalConfirmation"></app-modal-confirmation>
+  <ul class="status-task-container" *ngFor="let status of groupedTasks" cdkDropList [cdkDropListData]="status.tasks"
+    (cdkDropListDropped)="onDropCard($event,status.id)">
+    <div class="row">
+      <div class="col col-10 ">
+        <input class="status-name" [value]="status.name" (blur)="updateStatusName($event, status.id)">
+      </div>
+      <div class="col col-1">
+        <span style="cursor: pointer;" (click)="onClickDeleteStatus(status)">
+          <mat-icon aria-hidden="false" aria-label="Example trash icon">delete</mat-icon>
+        </span>
+      </div>
+    </div>
+    <li class="task-card-create" (click)="onClickCreateTasks({id : status.id, name : status.name})">
+      <p><span>+ </span>New</p>
+    </li>
+    <li class="task-card" *ngFor="let taskItem of status.tasks" cdkDrag [cdkDragData]="taskItem">
+      <h3 class="task-card-title">{{taskItem.title}}</h3>
+    </li>
+  </ul>
+  <ul id="create-new-status-icon-test">
+    <span *ngIf="progressNewStatus == false && groupedTasks.length > 0 " tabindex="0" data-toggle="tooltip" title="Criar status">
+      <button (click)="createNewStatus()">+</button>
+    </span>
+    <span *ngIf="progressNewStatus" tabindex="0" data-toggle="tooltip" title="Criar status">
+      <mat-spinner diameter="20"></mat-spinner>
+    </span>
+
+  </ul>
+  <app-modal-create-task [boardCode]="boardCode" (updateTaskList)="getAllTasks()" [listCategories]="listCategories"
+    [(showCreationModal)]="showModalCreateTask" [taskStatus]="selectedTaskStatus"></app-modal-create-task>
+</div>
+<div *ngIf="groupedTasks.length == 0" id="empty-board">
+  <h1>Crie sua primeira coluna de status</h1>
+  <button class="btn btn-success" (click)="createNewStatus()">Criar status</button>
+</div>

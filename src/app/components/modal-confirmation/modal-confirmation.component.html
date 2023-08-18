@@ -1,0 +1,16 @@
+<div *ngIf="showModal" class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display' : 'block'}">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">{{title}}</h2>
+      </div>
+      <div class="modal-body">
+        <p>{{message}}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="closeModal()">Cancelar</button>
+        <button type="button" class="btn btn-success" (click)="onConfirm()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>

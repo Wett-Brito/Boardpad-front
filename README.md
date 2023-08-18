@@ -1,14 +1,18 @@
-# BoardpadFront
+# Boardpad - Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.0.4.
+An `Angular 13` application that consists in a fast and non bureaucratic task management using a `Kanban` view.
+
+At moment we use `json-server` to simulate requests and responses and all datas is at `db.json` file.
+
+CRUD tasks will be done by a `Restfull Spring Boot Java Application` found at [BoardPad-Back](https://github.com/Wett-Brito/BoardPad-Back).
 
 ## Development server
 
+Run `json-server --watch db.json` and the fake API (JSON SERVER) will starts to run at http://localhost:3000.
+
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Or you can run command ng serve --o and the terminal will start your browser in the correct url automatically.
 
 ## Build
 
@@ -22,6 +26,9 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
 
-## Further help
+## Json Server
+This is a test Restful API that help to create and simulate quickly the resources that the `Boardpad` requests.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Run `json-server --watch db.json` to deploy a test `Restful API` on your desktop http://localhost:3000.
+
+All data is been controlled by the file `db.json`.
