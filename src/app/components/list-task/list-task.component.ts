@@ -28,7 +28,6 @@ export class ListTaskComponent implements OnInit {
 
   boardCode : string = "";
   listCategories : TaskCategoryResponseInterface [] = [];
-  listTasks: TaskResponseInterface[] = [];
   listStatusCategories: StatusTaskInterface[] = [];
   groupedTasks: GroupedTasks[] = [];
 
@@ -59,87 +58,59 @@ export class ListTaskComponent implements OnInit {
   ) {
     const routeParams = this.route.snapshot.paramMap;
     this.boardCode = routeParams.get('board-code') || "";
-
-    this.refreshPage();
   }
 
-  ngOnInit(): void {}
-
-  refreshPage () : void {
-    this.getOrCreateBoard();
-    this.getAllStatus();
-    this.categoryService.listAllCategories(this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.listCategories = response.response,
-      error : err => (err.status != 404) && console.log(err)
-    });
-  }
+  ngOnInit(): void {
+    this.getBoardData();
+  }  
   
-  getOrCreateBoard () : void {
+  getBoardData () : void {
     this.boardService.getBoardIfExists(this.boardCode).pipe(take(1)).subscribe({
+      next : responseData => {
+        this.groupedTasks = responseData.response.status;
+        // To Get All Status that haven't tasks
+        this.getAllStatus();
+      },
       error : err => {
         if(err.status == 404) {
-          this.boardService.createBoard(this.boardCode).pipe(take(1)).subscribe({
-            error : err => {
-              console.error(`Erro ao tentar criar o board [${this.boardCode}]`, err);
-              alert(`Erro ao tentar criar o board [${this.boardCode}]`);
-            }
-          });
+          this.createNewBoard();
         }
       }
     })
   }
-
-  getAllStatus(): void {
-    if (this.boardCode == null || this.boardCode.length == 0)  return;
-    this.statusService.listAllStatusCategories(this.boardCode).subscribe({
-      next: (response) => {
-        this.listStatusCategories = response;
-        this.getAllTasks();
-      },
-      error: (err) => {
-        if (err.status != 404 ) console.error(err)
-        else {
-          this.listStatusCategories = [];
-          this.getAllTasks();
-        };
+  createNewBoard () : void {
+    this.boardService.createBoard(this.boardCode).pipe(take(1)).subscribe({
+      next : () => this.getAllTasks(),
+      error : err => {
+        console.error(`Erro ao tentar criar o board [${this.boardCode}]`, err);
+        alert(`Erro ao tentar criar o board [${this.boardCode}]`);
       }
     });
   }
-
   getAllTasks(): void {
     if (this.boardCode == null || this.boardCode.length == 0)  return;
-    this.taskService.listAllTasks(this.boardCode).subscribe({
-      next: (response) => {
-        this.listTasks = response;
-        this.groupByCategory();
-      },
-      error: (err) =>  {
-        if (err.status != 404 ) console.error(err)
-        else {
-          this.listTasks = []
-          this.groupByCategory();
-        };
+    this.taskService.listAllTasks(this.boardCode).pipe(take(1)).subscribe({
+      next : response => {
+        this.groupedTasks = response;
+        // To Get All Status that haven't tasks
+        this.getAllStatus();
       }
+    })
+  }
+  getAllStatus() : void {
+    this.statusService.listAllStatusCategories(this.boardCode).pipe(take(1)).subscribe({
+      next : response => {
+        this.addStatusWithNoTasksToGroupedTasks(response);
+      },
+      error : err => console.error(err)
     });
   }
-
-  groupByCategory(): void {
-    this.groupedTasks = [];
-    let arrayTest: any[] = [];
-    if (this.listStatusCategories == null || this.listStatusCategories.length == 0) return;
-    this.listStatusCategories.forEach((categoryItem, index, arr) => {
-      let newObject: GroupedTasks = {
-        id: categoryItem.id,
-        name: categoryItem.name,
-        tasks: this.listTasks.filter(
-          (taskItem) => taskItem.idStatus === categoryItem.id
-        ) || [],
-      };
-      arrayTest.push(newObject);
-    });
-    this.groupedTasks.push(...arrayTest);
+  addStatusWithNoTasksToGroupedTasks(allStatus : StatusTaskInterface []) : void {
+    allStatus.forEach(item => {
+      if(this.groupedTasks.filter(groupedTask=> groupedTask.id == item.id).length <= 0 )
+      this.groupedTasks.push(item as GroupedTasks);
+    })
   }
-
   changeStatusTask(
     task: TaskResponseInterface,
     newIdStatus: number
@@ -208,7 +179,7 @@ export class ListTaskComponent implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: (response) => {
-          this.getAllStatus();
+          this.getAllTasks();
         },
         error: (err) => console.log(err)
       });
@@ -221,7 +192,7 @@ export class ListTaskComponent implements OnInit {
       .deleteStatus(idStatus,this.boardCode)
       .pipe(take(1))
       .subscribe({
-        next: (response) =>  this.getAllStatus(),
+        next: (response) =>  this.getAllTasks(),
         error: (err) => {
           if (err.status === 404) alert(err.error);
           else if (err.status != 404 ) console.error(err);
@@ -242,7 +213,7 @@ export class ListTaskComponent implements OnInit {
     this.progressTags = true;
     if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.categoryService.createCategory(this.newCategoryName, this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.refreshPage(),
+      next : response => this.getAllTasks(),
       error : err => console.log(err)
     })
     this.newCategoryName = "";
@@ -252,7 +223,7 @@ export class ListTaskComponent implements OnInit {
     if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.progressTags = true;
     this.categoryService.removeCategory(id, this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.refreshPage(),
+      next : response => this.getAllTasks(),
       error : err => console.log(err)
     })
     this.progressTags = false
@@ -265,7 +236,7 @@ export class ListTaskComponent implements OnInit {
     let newStatusName : string = event.target.value;
     this.statusService.updateStausName(statusId, newStatusName, this.boardCode).pipe(take(1))
     .subscribe({
-      next : response => this.refreshPage(),
+      next : response => this.getAllTasks(),
       error : err => console.error(err)
     })
   }
