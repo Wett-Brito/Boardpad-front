@@ -4,7 +4,7 @@ import { GroupedTasks } from './../../interfaces/grouped-tasks';
 import { StatusCategoryService } from './../../services/status-category.service';
 import { TaskService } from './../../services/task.service';
 import { TaskResponseInterface } from './../../interfaces/task-response-interface';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output } from '@angular/core';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {
   CdkDragDrop,
@@ -12,7 +12,7 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 
-import { take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { CategoriesService } from 'src/app/services/categories.service';
 import { ActivatedRoute } from '@angular/router';
@@ -26,13 +26,15 @@ import { BoardService } from 'src/app/services/board.service';
 export class ListTaskComponent implements OnInit {
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
+  selectedTaskStatusId = new BehaviorSubject<number>(0);
+  
   boardCode : string = "";
   listCategories : TaskCategoryResponseInterface [] = [];
   listStatusCategories: StatusTaskInterface[] = [];
   groupedTasks: GroupedTasks[] = [];
-
+  
   showModalCreateTask: boolean = false;
-
+  
   // Controle do Modal de Confirmação
   showModalConfirmation: boolean = false;
   dataModalConfirmation : any = {
@@ -41,12 +43,10 @@ export class ListTaskComponent implements OnInit {
   };
   titleModalConfirmation = "";
   textModalConfirmation = "";
-
-
+  
   progressNewStatus : boolean = false;
   progressTags : boolean = false;
-  selectedTaskStatus: StatusTaskInterface = {} as StatusTaskInterface;
-
+  
   newCategoryName : string = '';
 
   constructor(
@@ -80,7 +80,7 @@ export class ListTaskComponent implements OnInit {
   }
   createNewBoard () : void {
     this.boardService.createBoard(this.boardCode).pipe(take(1)).subscribe({
-      next : () => this.getAllTasks(),
+      next : () => this.getBoardData(),
       error : err => {
         console.error(`Erro ao tentar criar o board [${this.boardCode}]`, err);
         alert(`Erro ao tentar criar o board [${this.boardCode}]`);
@@ -151,7 +151,6 @@ export class ListTaskComponent implements OnInit {
         newIdStatus
       );
       if (updatedTaskData !== null) {
-        console.log(task);
         task = updatedTaskData;
         transferArrayItem(
           event.previousContainer.data,
@@ -163,14 +162,14 @@ export class ListTaskComponent implements OnInit {
     }
   }
 
-  onClickCreateTasks(obj = { id: 0, name: '' }): void {
-    this.selectedTaskStatus = {
-      id: obj.id,
-      name: obj.name,
-    };
+  onClickCreateTasks(id: number): void {
+    this.selectedTaskStatusId.next(id);
     this.showModalCreateTask = true;
   }
 
+  closeModalCreateTask() : void {
+    this.showModalCreateTask = false;
+  }
   createNewStatus(newStatusName : string = "New status"): void {
     if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.progressNewStatus = true;
@@ -178,10 +177,10 @@ export class ListTaskComponent implements OnInit {
       .createNewStatus(newStatusName, this.boardCode)
       .pipe(take(1))
       .subscribe({
-        next: (response) => {
-          this.getAllTasks();
-        },
-        error: (err) => console.log(err)
+        error: (err) => console.log(err),
+        complete: () => {
+          this.getBoardData();
+        }
       });
       this.progressNewStatus = false
   }
@@ -192,7 +191,7 @@ export class ListTaskComponent implements OnInit {
       .deleteStatus(idStatus,this.boardCode)
       .pipe(take(1))
       .subscribe({
-        next: (response) =>  this.getAllTasks(),
+        next: (response) =>  this.getBoardData(),
         error: (err) => {
           if (err.status === 404) alert(err.error);
           else if (err.status != 404 ) console.error(err);
@@ -213,7 +212,7 @@ export class ListTaskComponent implements OnInit {
     this.progressTags = true;
     if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.categoryService.createCategory(this.newCategoryName, this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.getAllTasks(),
+      next : response => this.getBoardData(),
       error : err => console.log(err)
     })
     this.newCategoryName = "";
@@ -223,7 +222,7 @@ export class ListTaskComponent implements OnInit {
     if (this.boardCode == null || this.boardCode.length == 0)  return;
     this.progressTags = true;
     this.categoryService.removeCategory(id, this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.getAllTasks(),
+      next : response => this.getBoardData(),
       error : err => console.log(err)
     })
     this.progressTags = false
@@ -236,8 +235,8 @@ export class ListTaskComponent implements OnInit {
     let newStatusName : string = event.target.value;
     this.statusService.updateStausName(statusId, newStatusName, this.boardCode).pipe(take(1))
     .subscribe({
-      next : response => this.getAllTasks(),
-      error : err => console.error(err)
+      error : err => console.error(err),
+      complete : () => this.getBoardData()
     })
   }
 }

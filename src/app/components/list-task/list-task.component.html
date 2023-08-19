@@ -13,7 +13,7 @@
         </span>
       </div>
     </div>
-    <li class="task-card-create" (click)="onClickCreateTasks({id : status.id, name : status.name})">
+    <li class="task-card-create" (click)="onClickCreateTasks(status.id)">
       <p><span>+ </span>New</p>
     </li>
     <li class="task-card" *ngFor="let taskItem of status.tasks" cdkDrag [cdkDragData]="taskItem">
@@ -29,8 +29,8 @@
     </span>
 
   </ul>
-  <app-modal-create-task [boardCode]="boardCode" (updateTaskList)="getAllTasks()" [listCategories]="listCategories"
-    [(showCreationModal)]="showModalCreateTask" [taskStatus]="selectedTaskStatus"></app-modal-create-task>
+  <app-modal-create-task *ngIf="showModalCreateTask" [boardCode]="boardCode" (updateTaskList)="getBoardData()" [listCategories]="listCategories"
+    (showCreationModal)="closeModalCreateTask()" [idStatusSubj]="selectedTaskStatusId"></app-modal-create-task>
 </div>
 <div *ngIf="groupedTasks.length == 0" id="empty-board">
   <h1>Crie sua primeira coluna de status</h1>

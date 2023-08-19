@@ -45,4 +45,8 @@ export class StatusCategoryService {
       }
     });
   }
+
+  getStatusById (idStatus : number) : Observable<StatusTaskInterface>{
+    return this.httpClient.get(`/api/status/${idStatus}/`) as Observable<StatusTaskInterface>;
+  }
 }
