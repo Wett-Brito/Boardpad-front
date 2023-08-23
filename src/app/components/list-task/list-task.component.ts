@@ -111,7 +111,7 @@ export class ListTaskComponent implements OnInit {
         this.groupedTasks.push(item as GroupedTasks);
     })
   }
-  
+
   onDropCard(
     event: CdkDragDrop<
       TaskResponseInterface[],
@@ -129,21 +129,28 @@ export class ListTaskComponent implements OnInit {
       );
     } else {
       // Fazer update
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
       this.taskService
         .updateTaskStatus(task.id, newIdStatus, this.boardCode)
         .pipe(take(1))
         .subscribe({
           next: (response) => {
             task = response;
-            transferArrayItem(
-              event.previousContainer.data,
-              event.container.data,
-              event.previousIndex,
-              event.currentIndex
-            );
           },
           error: err => {
-            if(err.status == 404) console.error('Erro ao mudar status da task.', err.error.message);
+            transferArrayItem(
+              event.container.data,
+              event.previousContainer.data,
+              event.currentIndex,
+              event.previousIndex
+            );
+            if (err.status == 404) alert('This status was not found on this board.');
+            else if (err.status > 499) alert('Internal Server Error. Unable to move this task. Try again later.');
           }
         });
     }
@@ -192,8 +199,8 @@ export class ListTaskComponent implements OnInit {
       method: this.deleteStatus,
       data: status.id
     }
-    this.titleModalConfirmation = "Confirmar remoção"
-    this.textModalConfirmation = `Deletando este o status "${status.name}" você também deletará todas as Tasks relacionada à ele`;
+    this.titleModalConfirmation = "Delete this status?"
+    this.textModalConfirmation = `If you delete  "${status.name}" status, all of its tasks will be moved to the "Unparented" status column.`;
   }
   addCategory() {
     this.progressTags = true;
