@@ -5,19 +5,29 @@
     (cdkDropListDropped)="onDropCard($event,status.id)">
     <div class="row">
       <div class="col col-10 ">
-        <input class="status-name" [value]="status.name" (blur)="updateStatusName($event, status.id)">
+        <input class="status-name" *ngIf="status.id > 0" [value]="status.name" (blur)="updateStatusName($event, status.id)">
+        <input disabled class="status-name" *ngIf="status.id == 0" [value]="status.name">
       </div>
       <div class="col col-1">
-        <span style="cursor: pointer;" (click)="onClickDeleteStatus(status)">
+        <span *ngIf="status.id > 0"  style="cursor: pointer;" (click)="onClickDeleteStatus(status)">
           <mat-icon aria-hidden="false" aria-label="Example trash icon">delete</mat-icon>
         </span>
       </div>
     </div>
-    <li class="task-card-create" (click)="onClickCreateTasks(status.id)">
+    <li *ngIf="status.id > 0" class="task-card-create" (click)="onClickCreateTasks(status.id)">
       <p><span>+ </span>New</p>
     </li>
     <li class="task-card" *ngFor="let taskItem of status.tasks" cdkDrag [cdkDragData]="taskItem">
-      <h3 class="task-card-title">{{taskItem.title}}</h3>
+      <div class="row">
+        <div class="col-10">
+          <h3 class="task-card-title">{{taskItem.title}}</h3>
+        </div>
+        <div class="col-2">
+          <span style="cursor: pointer;" (click)="onClickDeleteTask(taskItem)">
+            <mat-icon aria-hidden="false" aria-label="Example trash icon">delete</mat-icon>
+          </span>
+        </div>
+      </div>
     </li>
   </ul>
   <ul id="create-new-status-icon-test">
@@ -31,8 +41,4 @@
   </ul>
   <app-modal-create-task *ngIf="showModalCreateTask" [boardCode]="boardCode" (updateTaskList)="getBoardData()" [listCategories]="listCategories"
     (showCreationModal)="closeModalCreateTask()" [idStatusSubj]="selectedTaskStatusId"></app-modal-create-task>
-</div>
-<div *ngIf="groupedTasks.length == 0" id="empty-board">
-  <h1>Crie sua primeira coluna de status</h1>
-  <button class="btn btn-success" (click)="createNewStatus()">Criar status</button>
 </div>

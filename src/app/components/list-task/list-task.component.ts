@@ -198,6 +198,26 @@ export class ListTaskComponent implements OnInit {
       });
     this.progressNewStatus = false
   }
+  deleteTask = (taskId : number) : void =>{
+    this.taskService.deleteTaskById(taskId, this.boardCode).pipe(take(1)).subscribe({
+      next : () => this.getBoardData(),
+      error: err => {
+        if(err.status > 399 && err.status < 500) alert("Task could not be deleted.");
+        else alert("Internal Server Error. Please, try again later.");
+        this.getBoardData();
+      }
+    });
+  }
+  onClickDeleteTask(task: TaskResponseInterface): void {
+    console.log(task);
+    this.showModalConfirmation = true;
+    this.dataModalConfirmation = {
+      method: this.deleteTask,
+      data: task.id
+    }
+    this.titleModalConfirmation = "Delete this task?"
+    this.textModalConfirmation = `If you delete "${task.title}" task, all of its data will be permanently deleted.`;
+  }
   onClickDeleteStatus(status: GroupedTasks): void {
     this.showModalConfirmation = true;
     this.dataModalConfirmation = {
@@ -238,4 +258,6 @@ export class ListTaskComponent implements OnInit {
         complete: () => this.getBoardData()
       })
   }
+
+  
 }

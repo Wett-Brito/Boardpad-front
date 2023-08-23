@@ -34,4 +34,12 @@ export class TaskService {
       }
     }) as Observable<TaskResponseInterface>;
   }
+
+  deleteTaskById(taskId : number, boardCode : string) : Observable <any>{
+    return this.httpClient.delete(`/api/tasks/${taskId}`, {
+      params: {
+        "board-code": boardCode
+      }
+    }) as Observable<TaskResponseInterface>;
+  }
 }
