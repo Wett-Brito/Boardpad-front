@@ -15,7 +15,7 @@ import {
 import { BehaviorSubject, take } from 'rxjs';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { CategoriesService } from 'src/app/services/categories.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BoardService } from 'src/app/services/board.service';
 
 @Component({
@@ -54,6 +54,7 @@ export class ListTaskComponent implements OnInit {
     private statusService: StatusCategoryService,
     private categoryService: CategoriesService,
     private route: ActivatedRoute,
+    private router: Router,
     private boardService: BoardService
   ) {
     const routeParams = this.route.snapshot.paramMap;
@@ -74,6 +75,10 @@ export class ListTaskComponent implements OnInit {
       error: err => {
         if (err.status == 404) {
           this.createNewBoard();
+        }
+        else {
+          alert("Internal server error. Try again later.");
+          this.router.navigate(['/'])
         }
       }
     })
