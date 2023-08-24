@@ -1,6 +1,6 @@
 import { ModalConfirmationModule } from './../modal-confirmation/modal-confirmation.module';
 import { FormsModule } from '@angular/forms';
-import { ModalCreateTaskModule } from './../modal-create-task/modal-create-task.module';
+import { ModalCreateTaskModule } from '../modal-task-form/modal-task-form.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';

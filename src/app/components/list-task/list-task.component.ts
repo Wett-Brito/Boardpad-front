@@ -27,6 +27,7 @@ export class ListTaskComponent implements OnInit {
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   selectedTaskStatusId = new BehaviorSubject<number>(0);
+  selectedTaskId = new BehaviorSubject<number>(0);
 
   boardCode: string = "";
   listCategories: TaskCategoryResponseInterface[] = [];
@@ -34,6 +35,7 @@ export class ListTaskComponent implements OnInit {
   groupedTasks: GroupedTasks[] = [];
 
   showModalCreateTask: boolean = false;
+  showEditModal: boolean = false;
 
   // Controle do Modal de Confirmação
   showModalConfirmation: boolean = false;
@@ -166,8 +168,16 @@ export class ListTaskComponent implements OnInit {
     this.showModalCreateTask = true;
   }
 
+  onClickViewTask(taskId : number) {
+    this.selectedTaskStatusId.next(taskId);
+    this.showEditModal = true;
+  }
+
   closeModalCreateTask(): void {
     this.showModalCreateTask = false;
+  }
+  closeModalUpdateTaskModal() : void {
+    this.showEditModal = false;
   }
   createNewStatus(newStatusName: string = "New status"): void {
     if (this.boardCode == null || this.boardCode.length == 0) return;
@@ -208,6 +218,7 @@ export class ListTaskComponent implements OnInit {
       }
     });
   }
+
   onClickDeleteTask(task: TaskResponseInterface): void {
     console.log(task);
     this.showModalConfirmation = true;

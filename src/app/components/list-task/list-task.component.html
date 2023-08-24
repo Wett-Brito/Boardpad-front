@@ -17,7 +17,7 @@
     <li *ngIf="status.id > 0" class="task-card-create" (click)="onClickCreateTasks(status.id)">
       <p><span>+ </span>New</p>
     </li>
-    <li class="task-card" *ngFor="let taskItem of status.tasks" cdkDrag [cdkDragData]="taskItem">
+    <li class="task-card" (click)="onClickViewTask(taskItem.id)" *ngFor="let taskItem of status.tasks" cdkDrag [cdkDragData]="taskItem">
       <div class="row">
         <div class="col-10">
           <h3 class="task-card-title">{{taskItem.title}}</h3>
@@ -39,6 +39,9 @@
     </span>
 
   </ul>
-  <app-modal-create-task *ngIf="showModalCreateTask" [boardCode]="boardCode" (updateTaskList)="getBoardData()" [listCategories]="listCategories"
-    (showCreationModal)="closeModalCreateTask()" [idStatusSubj]="selectedTaskStatusId"></app-modal-create-task>
+  <app-modal-task-form *ngIf="showModalCreateTask" [boardCode]="boardCode" (updateTaskList)="getBoardData()" [listCategories]="listCategories"
+    (showModal)="closeModalCreateTask()" [idStatusSubj]="selectedTaskStatusId" ></app-modal-task-form>
+  
+    <app-modal-task-form *ngIf="showEditModal" [boardCode]="boardCode" (updateTaskList)="getBoardData()" [listCategories]="listCategories"
+    (showModal)="closeModalUpdateTaskModal()" [taskIdBehavior]="selectedTaskStatusId" ></app-modal-task-form>
 </div>

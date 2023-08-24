@@ -42,4 +42,8 @@ export class TaskService {
       }
     }) as Observable<TaskResponseInterface>;
   }
+
+  getTaskById (taskId : number) : Observable <any> {
+    return this.httpClient.get(`/api/tasks/${taskId}`) as Observable<TaskResponseInterface>;
+  }
 }
