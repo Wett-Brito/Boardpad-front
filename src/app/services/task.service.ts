@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { GroupedTasks } from '../interfaces/grouped-tasks';
+import { GenericResponse } from '../interfaces/generic-reponse-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +44,7 @@ export class TaskService {
     }) as Observable<TaskResponseInterface>;
   }
 
-  getTaskById (taskId : number) : Observable <any> {
-    return this.httpClient.get(`/api/tasks/${taskId}`) as Observable<TaskResponseInterface>;
+  getTaskById (taskId : number) : Observable <GenericResponse<TaskResponseInterface>> {
+    return this.httpClient.get(`/api/tasks/${taskId}`) as Observable<GenericResponse<TaskResponseInterface>> ;
   }
 }

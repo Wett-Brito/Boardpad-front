@@ -11,12 +11,10 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-
-import { BehaviorSubject, take } from 'rxjs';
-import { MatChipInputEvent } from '@angular/material/chips';
 import { CategoriesService } from 'src/app/services/categories.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BoardService } from 'src/app/services/board.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-list-task',
@@ -26,8 +24,8 @@ import { BoardService } from 'src/app/services/board.service';
 export class ListTaskComponent implements OnInit {
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-  selectedTaskStatusId = new BehaviorSubject<number>(0);
-  selectedTaskId = new BehaviorSubject<number>(0);
+  taskToEdit : TaskResponseInterface = {} as TaskResponseInterface;
+  newTaskStatus : StatusTaskInterface = {}  as StatusTaskInterface;
 
   boardCode: string = "";
   listCategories: TaskCategoryResponseInterface[] = [];
@@ -61,6 +59,17 @@ export class ListTaskComponent implements OnInit {
   ) {
     const routeParams = this.route.snapshot.paramMap;
     this.boardCode = routeParams.get('board-code') || "";
+  }
+
+  createTask = (taskForm : TaskResponseInterface): void => {
+    if (this.boardCode == null || this.boardCode.length == 0) return;
+    this.taskService.createTask(taskForm, this.boardCode).pipe(take(1)).subscribe({
+      next: response => {
+        this.getBoardData();
+        this.closeModalCreateTask();
+      },
+      error: err => console.log(err)
+    })
   }
 
   ngOnInit(): void {
@@ -163,21 +172,28 @@ export class ListTaskComponent implements OnInit {
     }
   }
 
-  onClickCreateTasks(id: number): void {
-    this.selectedTaskStatusId.next(id);
+  onClickCreateTasks(id : number, name: string): void {
+    this.newTaskStatus =  {id : id, name: name};
     this.showModalCreateTask = true;
   }
 
   onClickViewTask(taskId : number) {
-    this.selectedTaskStatusId.next(taskId);
-    this.showEditModal = true;
+    this.taskService.getTaskById(taskId).pipe(take(1)).subscribe({
+      next : resp => {
+        this.showEditModal = true;
+        this.taskToEdit = resp.response;
+      },
+      error: err => alert("Error while searching for task data.")
+    });
   }
 
   closeModalCreateTask(): void {
     this.showModalCreateTask = false;
+    this.newTaskStatus = {} as StatusTaskInterface;
   }
   closeModalUpdateTaskModal() : void {
     this.showEditModal = false;
+    this.taskToEdit = {} as TaskResponseInterface;
   }
   createNewStatus(newStatusName: string = "New status"): void {
     if (this.boardCode == null || this.boardCode.length == 0) return;
@@ -265,10 +281,14 @@ export class ListTaskComponent implements OnInit {
     let newStatusName: string = event.target.value;
     this.statusService.updateStausName(statusId, newStatusName, this.boardCode).pipe(take(1))
       .subscribe({
+        next : () => this.updateColumnNameOfTasksList(statusId, newStatusName),
         error: err => console.error(err),
         complete: () => this.getBoardData()
       })
   }
-
+  updateColumnNameOfTasksList (id : number, name : string) : void {
+    let index = this.groupedTasks.findIndex(item => item.id == id );
+    this.groupedTasks[index].name = name;
+  }
   
 }
