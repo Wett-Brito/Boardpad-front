@@ -39,9 +39,9 @@
     </span>
 
   </ul>
-  <app-modal-task-form *ngIf="showModalCreateTask" [formType]="2" [boardCode]="boardCode" [onSubmitMethod]="createTask" [listCategories]="listCategories"
+  <app-modal-task-form *ngIf="showModalCreateTask" [formType]="2" [boardCode]="boardCode" [onSubmitMethod]="createTask"
     (showModal)="closeModalCreateTask()" [targetStatusColumn] = "newTaskStatus"></app-modal-task-form>
   
-    <app-modal-task-form *ngIf="showEditModal" [formType]="3" [boardCode]="boardCode" (updateTaskList)="getBoardData()" [listCategories]="listCategories"
+    <app-modal-task-form *ngIf="showEditModal" [formType]="3" [boardCode]="boardCode" [onSubmitMethod]="updateTask" 
     (showModal)="closeModalUpdateTaskModal()" [taskToEdit]="taskToEdit" ></app-modal-task-form>
 </div>

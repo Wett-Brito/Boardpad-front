@@ -2,7 +2,6 @@ import { TaskService } from '../../services/task.service';
 import { TaskResponseInterface } from '../../interfaces/task-response-interface';
 import { BehaviorSubject, take } from 'rxjs';
 import { TaskCategoryResponseInterface } from '../../interfaces/task-category-response-interface';
-import { CategoriesService } from '../../services/categories.service';
 import { StatusTaskInterface } from '../../interfaces/status-task-interface';
 import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { NgForm } from '@angular/forms';
@@ -25,10 +24,6 @@ export class ModalTaskFormComponent implements OnInit {
   boardCode = "";
   @Output()
   showModal = new EventEmitter<boolean>();
-  @Output()
-  updateTaskList = new EventEmitter();
-  @Input()
-  listCategories: TaskCategoryResponseInterface[] = [];
 
   @Input()
   onSubmitMethod = (taskForm : TaskResponseInterface) => {};
@@ -39,7 +34,6 @@ export class ModalTaskFormComponent implements OnInit {
   taskForm: TaskResponseInterface = {} as TaskResponseInterface;
 
   constructor(
-    private categoryService: CategoriesService,
     private taskService: TaskService) {
     this.taskForm.idCategory = 0;
   }
@@ -48,8 +42,6 @@ export class ModalTaskFormComponent implements OnInit {
     if (this.formType == FormType.CREATE) {
       this.taskForm.idStatus = this.targetStatusColumn.id;
       this.taskForm.nameStatus = this.targetStatusColumn.name;
-
-      this.getAllCategories();
     }
     else if (this.formType == FormType.UPDATE) this.taskForm = this.taskToEdit;
   }
@@ -59,15 +51,6 @@ export class ModalTaskFormComponent implements OnInit {
     this.showModal.emit(false);
   }
   
-  getAllCategories(): void {
-    if (this.boardCode == null || this.boardCode.length == 0) return;
-    this.categoryService.listAllCategories(this.boardCode).pipe(take(1)).subscribe({
-      next: response => {
-        this.listCategories = response.response;
-      },
-      error: err => (err.status != 404) && console.log(err)
-    })
-  }
   formSubmit(event : any) {
     event.preventDefault();
     this.onSubmitMethod(this.taskForm);
