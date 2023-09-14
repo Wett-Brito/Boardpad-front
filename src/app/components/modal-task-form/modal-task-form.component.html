@@ -1,11 +1,11 @@
-<div *ngIf="showCreationModal" class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display' : 'block'}">
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display' : 'block'}">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title">Criar nova tarefa</h2>
       </div>
       <div class="modal-body">
-        <form class="form-group" (ngSubmit)="createTask ()">
+        <form class="form-group" (ngSubmit)="formSubmit($event)">
           <!--title : string; -->
           <div class="form-group">
             <label for="inputTitle">Titulo</label>
@@ -27,10 +27,13 @@
           <!-- status : number; -->
           <div class="form-group">
             <label for="inputStatus">Status</label>
-            <input type="text" class="form-control " disabled id="inputStatus" [value]="taskStatus.name">
+            <input type="text" class="form-control " disabled id="inputStatus" [value]="taskForm.nameStatus">
           </div>
-          <button type="submit" class="btn btn-success mt-3 float-right">
+          <button *ngIf="formType == 2" type="submit" class="btn btn-success mt-3 float-right">
             Criar Tarefa
+          </button>
+          <button *ngIf="formType == 3" disabled type="submit" class="btn btn-success mt-3 float-right">
+            Atualizar dados
           </button>
         </form>
       </div>

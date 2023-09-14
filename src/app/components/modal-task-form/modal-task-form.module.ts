@@ -1,20 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalCreateTaskComponent } from './modal-create-task.component';
+import { ModalTaskFormComponent } from './modal-task-form.component';
 import { FormsModule } from '@angular/forms';
 
 
 
 @NgModule({
   declarations: [
-    ModalCreateTaskComponent
+    ModalTaskFormComponent
   ],
   imports: [
     CommonModule,
     FormsModule
   ],
   exports: [
-    ModalCreateTaskComponent
+    ModalTaskFormComponent
   ]
 })
 export class ModalCreateTaskModule { }

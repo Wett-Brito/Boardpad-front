@@ -4,19 +4,17 @@ import { GroupedTasks } from './../../interfaces/grouped-tasks';
 import { StatusCategoryService } from './../../services/status-category.service';
 import { TaskService } from './../../services/task.service';
 import { TaskResponseInterface } from './../../interfaces/task-response-interface';
-import { Component, OnInit, Input } from '@angular/core';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import { Component, OnInit, Input, Output } from '@angular/core';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-
-import { take } from 'rxjs';
-import { MatChipInputEvent } from '@angular/material/chips';
 import { CategoriesService } from 'src/app/services/categories.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BoardService } from 'src/app/services/board.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-list-task',
@@ -26,107 +24,108 @@ import { BoardService } from 'src/app/services/board.service';
 export class ListTaskComponent implements OnInit {
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-  boardCode : string = "";
-  listCategories : TaskCategoryResponseInterface [] = [];
+  taskToEdit : TaskResponseInterface = {} as TaskResponseInterface;
+  newTaskStatus : StatusTaskInterface = {}  as StatusTaskInterface;
+
+  boardCode: string = "";
+  listCategories: TaskCategoryResponseInterface[] = [];
   listStatusCategories: StatusTaskInterface[] = [];
   groupedTasks: GroupedTasks[] = [];
 
   showModalCreateTask: boolean = false;
+  showEditModal: boolean = false;
 
   // Controle do Modal de Confirmação
   showModalConfirmation: boolean = false;
-  dataModalConfirmation : any = {
-    method : () =>{},
-    data : {}
+  dataModalConfirmation: any = {
+    method: () => { },
+    data: {}
   };
   titleModalConfirmation = "";
   textModalConfirmation = "";
 
+  progressNewStatus: boolean = false;
+  progressTags: boolean = false;
 
-  progressNewStatus : boolean = false;
-  progressTags : boolean = false;
-  selectedTaskStatus: StatusTaskInterface = {} as StatusTaskInterface;
-
-  newCategoryName : string = '';
+  newCategoryName: string = '';
 
   constructor(
     private taskService: TaskService,
     private statusService: StatusCategoryService,
-    private categoryService : CategoriesService,
-    private route : ActivatedRoute,
-    private boardService : BoardService
+    private categoryService: CategoriesService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private boardService: BoardService
   ) {
     const routeParams = this.route.snapshot.paramMap;
     this.boardCode = routeParams.get('board-code') || "";
   }
 
+  createTask = (taskForm : TaskResponseInterface): void => {
+    if (this.boardCode == null || this.boardCode.length == 0) return;
+    this.taskService.createTask(taskForm, this.boardCode).pipe(take(1)).subscribe({
+      next: response => {
+        this.getBoardData();
+        this.closeModalCreateTask();
+      },
+      error: err => console.log(err)
+    })
+  }
+
   ngOnInit(): void {
     this.getBoardData();
-  }  
-  
-  getBoardData () : void {
+  }
+
+  getBoardData(): void {
     this.boardService.getBoardIfExists(this.boardCode).pipe(take(1)).subscribe({
-      next : responseData => {
+      next: responseData => {
         this.groupedTasks = responseData.response.status;
         // To Get All Status that haven't tasks
         this.getAllStatus();
       },
-      error : err => {
-        if(err.status == 404) {
+      error: err => {
+        if (err.status == 404) {
           this.createNewBoard();
+        }
+        else {
+          alert("Internal server error. Try again later.");
+          this.router.navigate(['/'])
         }
       }
     })
   }
-  createNewBoard () : void {
+  createNewBoard(): void {
     this.boardService.createBoard(this.boardCode).pipe(take(1)).subscribe({
-      next : () => this.getAllTasks(),
-      error : err => {
+      next: () => this.getBoardData(),
+      error: err => {
         console.error(`Erro ao tentar criar o board [${this.boardCode}]`, err);
         alert(`Erro ao tentar criar o board [${this.boardCode}]`);
       }
     });
   }
   getAllTasks(): void {
-    if (this.boardCode == null || this.boardCode.length == 0)  return;
+    if (this.boardCode == null || this.boardCode.length == 0) return;
     this.taskService.listAllTasks(this.boardCode).pipe(take(1)).subscribe({
-      next : response => {
+      next: response => {
         this.groupedTasks = response;
         // To Get All Status that haven't tasks
         this.getAllStatus();
       }
     })
   }
-  getAllStatus() : void {
+  getAllStatus(): void {
     this.statusService.listAllStatusCategories(this.boardCode).pipe(take(1)).subscribe({
-      next : response => {
+      next: response => {
         this.addStatusWithNoTasksToGroupedTasks(response);
       },
-      error : err => console.error(err)
+      error: err => console.error(err)
     });
   }
-  addStatusWithNoTasksToGroupedTasks(allStatus : StatusTaskInterface []) : void {
+  addStatusWithNoTasksToGroupedTasks(allStatus: StatusTaskInterface[]): void {
     allStatus.forEach(item => {
-      if(this.groupedTasks.filter(groupedTask=> groupedTask.id == item.id).length <= 0 )
-      this.groupedTasks.push(item as GroupedTasks);
+      if (this.groupedTasks.filter(groupedTask => groupedTask.id == item.id).length <= 0)
+        this.groupedTasks.push(item as GroupedTasks);
     })
-  }
-  changeStatusTask(
-    task: TaskResponseInterface,
-    newIdStatus: number
-  ): TaskResponseInterface {
-    let updatedTask: TaskResponseInterface = {} as TaskResponseInterface;
-    if (this.boardCode == null || this.boardCode.length == 0)  return {} as TaskResponseInterface;
-    this.taskService
-      .updateTaskStatus(task.id, newIdStatus, this.boardCode)
-      .pipe(take(1))
-      .subscribe({
-        next: (response) => (updatedTask = response),
-        error: (err) => {
-          console.log(err);
-        },
-      });
-    return updatedTask;
   }
 
   onDropCard(
@@ -146,98 +145,150 @@ export class ListTaskComponent implements OnInit {
       );
     } else {
       // Fazer update
-      let updatedTaskData: TaskResponseInterface = this.changeStatusTask(
-        task,
-        newIdStatus
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
       );
-      if (updatedTaskData !== null) {
-        console.log(task);
-        task = updatedTaskData;
-        transferArrayItem(
-          event.previousContainer.data,
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex
-        );
-      } else alert('Erro ao mudar status da task');
+      this.taskService
+        .updateTaskStatus(task.id, newIdStatus, this.boardCode)
+        .pipe(take(1))
+        .subscribe({
+          next: (response) => {
+            task = response;
+          },
+          error: err => {
+            transferArrayItem(
+              event.container.data,
+              event.previousContainer.data,
+              event.currentIndex,
+              event.previousIndex
+            );
+            if (err.status == 404) alert('This status was not found on this board.');
+            else if (err.status > 499) alert('Internal Server Error. Unable to move this task. Try again later.');
+          }
+        });
     }
   }
 
-  onClickCreateTasks(obj = { id: 0, name: '' }): void {
-    this.selectedTaskStatus = {
-      id: obj.id,
-      name: obj.name,
-    };
+  onClickCreateTasks(id : number, name: string): void {
+    this.newTaskStatus =  {id : id, name: name};
     this.showModalCreateTask = true;
   }
 
-  createNewStatus(newStatusName : string = "New status"): void {
-    if (this.boardCode == null || this.boardCode.length == 0)  return;
+  onClickViewTask(taskId : number) {
+    this.taskService.getTaskById(taskId).pipe(take(1)).subscribe({
+      next : resp => {
+        this.showEditModal = true;
+        this.taskToEdit = resp.response;
+      },
+      error: err => alert("Error while searching for task data.")
+    });
+  }
+
+  closeModalCreateTask(): void {
+    this.showModalCreateTask = false;
+    this.newTaskStatus = {} as StatusTaskInterface;
+  }
+  closeModalUpdateTaskModal() : void {
+    this.showEditModal = false;
+    this.taskToEdit = {} as TaskResponseInterface;
+  }
+  createNewStatus(newStatusName: string = "New status"): void {
+    if (this.boardCode == null || this.boardCode.length == 0) return;
     this.progressNewStatus = true;
     this.statusService
       .createNewStatus(newStatusName, this.boardCode)
       .pipe(take(1))
       .subscribe({
-        next: (response) => {
-          this.getAllTasks();
-        },
-        error: (err) => console.log(err)
-      });
-      this.progressNewStatus = false
-  }
-  deleteStatus = (idStatus: number) : void => {
-    if (this.boardCode == null || this.boardCode.length == 0)  return;
-    this.progressNewStatus = true;
-    this.statusService
-      .deleteStatus(idStatus,this.boardCode)
-      .pipe(take(1))
-      .subscribe({
-        next: (response) =>  this.getAllTasks(),
-        error: (err) => {
-          if (err.status === 404) alert(err.error);
-          else if (err.status != 404 ) console.error(err);
+        error: (err) => console.log(err),
+        complete: () => {
+          this.getBoardData();
         }
       });
-      this.progressNewStatus = false
+    this.progressNewStatus = false
   }
-  onClickDeleteStatus( status : GroupedTasks ) : void {
+  deleteStatus = (idStatus: number): void => {
+    if (this.boardCode == null || this.boardCode.length == 0) return;
+    this.progressNewStatus = true;
+    this.statusService
+      .deleteStatus(idStatus, this.boardCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => this.getBoardData(),
+        error: (err) => {
+          if (err.status === 404) alert(err.error);
+          else if (err.status != 404) console.error(err);
+        }
+      });
+    this.progressNewStatus = false
+  }
+  deleteTask = (taskId : number) : void =>{
+    this.taskService.deleteTaskById(taskId, this.boardCode).pipe(take(1)).subscribe({
+      next : () => this.getBoardData(),
+      error: err => {
+        if(err.status > 399 && err.status < 500) alert("Task could not be deleted.");
+        else alert("Internal Server Error. Please, try again later.");
+        this.getBoardData();
+      }
+    });
+  }
+
+  onClickDeleteTask(task: TaskResponseInterface): void {
+    console.log(task);
     this.showModalConfirmation = true;
     this.dataModalConfirmation = {
-      method : this.deleteStatus,
-      data : status.id
+      method: this.deleteTask,
+      data: task.id
     }
-    this.titleModalConfirmation = "Confirmar remoção"
-    this.textModalConfirmation = `Deletando este o status "${status.name}" você também deletará todas as Tasks relacionada à ele`;
+    this.titleModalConfirmation = "Delete this task?"
+    this.textModalConfirmation = `If you delete "${task.title}" task, all of its data will be permanently deleted.`;
   }
-  addCategory () {
+  onClickDeleteStatus(status: GroupedTasks): void {
+    this.showModalConfirmation = true;
+    this.dataModalConfirmation = {
+      method: this.deleteStatus,
+      data: status.id
+    }
+    this.titleModalConfirmation = "Delete this status?"
+    this.textModalConfirmation = `If you delete  "${status.name}" status, all of its tasks will be moved to the "Unparented" status column.`;
+  }
+  addCategory() {
     this.progressTags = true;
-    if (this.boardCode == null || this.boardCode.length == 0)  return;
+    if (this.boardCode == null || this.boardCode.length == 0) return;
     this.categoryService.createCategory(this.newCategoryName, this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.getAllTasks(),
-      error : err => console.log(err)
+      next: response => this.getBoardData(),
+      error: err => console.log(err)
     })
     this.newCategoryName = "";
     this.progressTags = false
   }
-  removeCategory (id : number) : void {
-    if (this.boardCode == null || this.boardCode.length == 0)  return;
+  removeCategory(id: number): void {
+    if (this.boardCode == null || this.boardCode.length == 0) return;
     this.progressTags = true;
     this.categoryService.removeCategory(id, this.boardCode).pipe(take(1)).subscribe({
-      next : response => this.getAllTasks(),
-      error : err => console.log(err)
+      next: response => this.getBoardData(),
+      error: err => console.log(err)
     })
     this.progressTags = false
   }
 
-  updateStatusName(event : any, statusId : number){
+  updateStatusName(event: any, statusId: number) {
     event.preventDefault();
-    
-    if (this.boardCode == null || this.boardCode.length == 0)  return;
-    let newStatusName : string = event.target.value;
+
+    if (this.boardCode == null || this.boardCode.length == 0) return;
+    let newStatusName: string = event.target.value;
     this.statusService.updateStausName(statusId, newStatusName, this.boardCode).pipe(take(1))
-    .subscribe({
-      next : response => this.getAllTasks(),
-      error : err => console.error(err)
-    })
+      .subscribe({
+        next : () => this.updateColumnNameOfTasksList(statusId, newStatusName),
+        error: err => console.error(err),
+        complete: () => this.getBoardData()
+      })
   }
+  updateColumnNameOfTasksList (id : number, name : string) : void {
+    let index = this.groupedTasks.findIndex(item => item.id == id );
+    this.groupedTasks[index].name = name;
+  }
+  
 }
