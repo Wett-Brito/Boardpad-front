@@ -19,19 +19,19 @@
             <label for="inputStatus">Status</label>
             <input type="text" class="form-control " disabled id="inputStatus" [value]="taskForm.nameStatus">
           </div>
-          <div class="d-flex justify-content-end mt-3">
-            <div class="">
-              <button *ngIf="formType == 2" type="submit" class="btn btn-success">
-                Create
-              </button>
-              <button *ngIf="formType == 3" type="submit" class="btn btn-success">
-                Update data
-              </button>
-            </div>
-            <div class="ms-3">
-              <button type="button" class="btn btn-danger full-width" (click)="closeCreationModal()">
+          <div class="d-flex mt-3">
+            <div class="me-auto">
+              <button type="button" class="btn btn-outline-danger full-width" (click)="closeCreationModal()">
                 Close
               </button>              
+            </div>
+            <div class="">
+              <button *ngIf="formType == 2" type="submit" class="btn btn-outline-success">
+                Create
+              </button>
+              <button *ngIf="formType == 3" type="submit" class="btn btn-outline-success">
+                Update data
+              </button>
             </div>
           </div>
         </form>
