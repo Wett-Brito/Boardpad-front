@@ -1,47 +1,44 @@
 <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display' : 'block'}">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">Criar nova tarefa</h2>
-      </div>
+      
       <div class="modal-body">
         <form class="form-group" (ngSubmit)="formSubmit($event)">
           <!--title : string; -->
           <div class="form-group">
-            <label for="inputTitle">Titulo</label>
+            <label for="inputTitle">Title</label>
             <input type="text" class="form-control" id="inputTitle" placeholder="Insira o título da tarefa" name="title" [(ngModel)]="taskForm.title">
           </div>
           <!--description : string; -->
           <div class="form-group">
-            <label for="inputDescription">Descrição</label>
+            <label for="inputDescription">Description</label>
             <input type="text" class="form-control" id="inputDescription" placeholder="Insira a descrição da tarefa" name="description" [(ngModel)]="taskForm.description">
-          </div>
-          <!--category : string; -->
-          <div class="form-group" *ngIf="listCategories.length > 0">
-            <label for="inputCategory">Categoria</label>
-            <select class="form-select" id="inputCategory" name="category" [(ngModel)]="taskForm.idCategory">
-              <option value="0">Selecione a categoria da tarefa</option>
-              <option *ngFor="let category of listCategories" [value]="category.id">{{category.name}}</option>
-            </select>            
           </div>
           <!-- status : number; -->
           <div class="form-group">
             <label for="inputStatus">Status</label>
             <input type="text" class="form-control " disabled id="inputStatus" [value]="taskForm.nameStatus">
           </div>
-          <button *ngIf="formType == 2" type="submit" class="btn btn-success mt-3 float-right">
-            Criar Tarefa
-          </button>
-          <button *ngIf="formType == 3" disabled type="submit" class="btn btn-success mt-3 float-right">
-            Atualizar dados
-          </button>
+          <div class="d-flex mt-3">
+            <div class="me-auto">
+              <button type="button" class="btn btn-outline-danger full-width" (click)="closeCreationModal()">
+                Close
+              </button>              
+            </div>
+            <div class="">
+              <button *ngIf="formType == 2" type="submit" class="btn btn-outline-success">
+                Create
+              </button>
+              <button *ngIf="formType == 3" type="submit" class="btn btn-outline-success">
+                Update data
+              </button>
+            </div>
+          </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="closeCreationModal()">
-          Fechar
-        </button>
-      </div>
+      <!--div class="modal-footer">
+        
+      </div-->
     </div>
   </div>
 </div>

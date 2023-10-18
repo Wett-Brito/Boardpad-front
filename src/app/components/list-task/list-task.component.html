@@ -5,11 +5,11 @@
     (cdkDropListDropped)="onDropCard($event,status.id)">
     <div class="row">
       <div class="col col-10 ">
-        <input class="status-name" *ngIf="status.id > 0" [value]="status.name" (blur)="updateStatusName($event, status.id)">
+        <input class="status-name" *ngIf="status.id > 0" [value]="status.name" (blur)="updateStatusName($event, status.id)" title="Edit status column name">
         <input disabled class="status-name" *ngIf="status.id == 0" [value]="status.name">
       </div>
       <div class="col col-1">
-        <span *ngIf="status.id > 0"  style="cursor: pointer;" (click)="onClickDeleteStatus(status)">
+        <span *ngIf="status.id > 0"  style="cursor: pointer;" (click)="onClickDeleteStatus(status)" title="Delete status column">
           <mat-icon aria-hidden="false" aria-label="Example trash icon">delete</mat-icon>
         </span>
       </div>
@@ -24,24 +24,24 @@
         </div>
         <div class="col-2">
           <span style="cursor: pointer;" (click)="onClickDeleteTask(taskItem)">
-            <mat-icon aria-hidden="false" aria-label="Example trash icon">delete</mat-icon>
+            <mat-icon aria-hidden="false" aria-label="Example trash icon" title="Delete task">delete</mat-icon>
           </span>
         </div>
       </div>
     </li>
   </ul>
   <ul id="create-new-status-icon-test">
-    <span *ngIf="progressNewStatus == false && groupedTasks.length > 0 " tabindex="0" data-toggle="tooltip" title="Criar status">
+    <span *ngIf="progressNewStatus == false && groupedTasks.length > 0 " tabindex="0" data-toggle="tooltip" title="Create new status column">
       <button (click)="createNewStatus()">+</button>
     </span>
-    <span *ngIf="progressNewStatus" tabindex="0" data-toggle="tooltip" title="Criar status">
+    <span *ngIf="progressNewStatus" tabindex="0" data-toggle="tooltip" title="Create new status column">
       <mat-spinner diameter="20"></mat-spinner>
     </span>
 
   </ul>
-  <app-modal-task-form *ngIf="showModalCreateTask" [formType]="2" [boardCode]="boardCode" [onSubmitMethod]="createTask" [listCategories]="listCategories"
+  <app-modal-task-form *ngIf="showModalCreateTask" [formType]="2" [boardCode]="boardCode" [onSubmitMethod]="createTask"
     (showModal)="closeModalCreateTask()" [targetStatusColumn] = "newTaskStatus"></app-modal-task-form>
   
-    <app-modal-task-form *ngIf="showEditModal" [formType]="3" [boardCode]="boardCode" (updateTaskList)="getBoardData()" [listCategories]="listCategories"
+    <app-modal-task-form *ngIf="showEditModal" [formType]="3" [boardCode]="boardCode" [onSubmitMethod]="updateTask" 
     (showModal)="closeModalUpdateTaskModal()" [taskToEdit]="taskToEdit" ></app-modal-task-form>
 </div>

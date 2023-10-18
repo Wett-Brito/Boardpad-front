@@ -1,4 +1,3 @@
-import { TaskCategoryResponseInterface } from './../../interfaces/task-category-response-interface';
 import { StatusTaskInterface } from './../../interfaces/status-task-interface';
 import { GroupedTasks } from './../../interfaces/grouped-tasks';
 import { StatusCategoryService } from './../../services/status-category.service';
@@ -11,7 +10,6 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-import { CategoriesService } from 'src/app/services/categories.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BoardService } from 'src/app/services/board.service';
 import { take } from 'rxjs';
@@ -28,7 +26,6 @@ export class ListTaskComponent implements OnInit {
   newTaskStatus : StatusTaskInterface = {}  as StatusTaskInterface;
 
   boardCode: string = "";
-  listCategories: TaskCategoryResponseInterface[] = [];
   listStatusCategories: StatusTaskInterface[] = [];
   groupedTasks: GroupedTasks[] = [];
 
@@ -47,12 +44,9 @@ export class ListTaskComponent implements OnInit {
   progressNewStatus: boolean = false;
   progressTags: boolean = false;
 
-  newCategoryName: string = '';
-
   constructor(
     private taskService: TaskService,
     private statusService: StatusCategoryService,
-    private categoryService: CategoriesService,
     private route: ActivatedRoute,
     private router: Router,
     private boardService: BoardService
@@ -61,14 +55,25 @@ export class ListTaskComponent implements OnInit {
     this.boardCode = routeParams.get('board-code') || "";
   }
 
+  updateTask = (taskForm : TaskResponseInterface): void =>{
+    if (this.boardCode == null || this.boardCode.length == 0) return;
+    this.taskService.updateTaskData(this.taskToEdit.id, taskForm).pipe(take(1)).subscribe({
+      next : () => {
+        this.closeModalUpdateTaskModal();
+        this.getBoardData();
+      },
+      error: err => console.error("Error during task updating data. ", err)
+    });
+  }
+
   createTask = (taskForm : TaskResponseInterface): void => {
     if (this.boardCode == null || this.boardCode.length == 0) return;
     this.taskService.createTask(taskForm, this.boardCode).pipe(take(1)).subscribe({
-      next: response => {
+      next: () => {
         this.getBoardData();
         this.closeModalCreateTask();
       },
-      error: err => console.log(err)
+      error: err => console.error(err)
     })
   }
 
@@ -254,25 +259,7 @@ export class ListTaskComponent implements OnInit {
     this.titleModalConfirmation = "Delete this status?"
     this.textModalConfirmation = `If you delete  "${status.name}" status, all of its tasks will be moved to the "Unparented" status column.`;
   }
-  addCategory() {
-    this.progressTags = true;
-    if (this.boardCode == null || this.boardCode.length == 0) return;
-    this.categoryService.createCategory(this.newCategoryName, this.boardCode).pipe(take(1)).subscribe({
-      next: response => this.getBoardData(),
-      error: err => console.log(err)
-    })
-    this.newCategoryName = "";
-    this.progressTags = false
-  }
-  removeCategory(id: number): void {
-    if (this.boardCode == null || this.boardCode.length == 0) return;
-    this.progressTags = true;
-    this.categoryService.removeCategory(id, this.boardCode).pipe(take(1)).subscribe({
-      next: response => this.getBoardData(),
-      error: err => console.log(err)
-    })
-    this.progressTags = false
-  }
+  
 
   updateStatusName(event: any, statusId: number) {
     event.preventDefault();

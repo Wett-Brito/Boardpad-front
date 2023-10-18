@@ -47,4 +47,8 @@ export class TaskService {
   getTaskById (taskId : number) : Observable <GenericResponse<TaskResponseInterface>> {
     return this.httpClient.get(`/api/tasks/${taskId}`) as Observable<GenericResponse<TaskResponseInterface>> ;
   }
+
+  updateTaskData (taskId : number, taskForm : TaskResponseInterface) : Observable <GenericResponse<any>> {
+    return this.httpClient.put(`/api/tasks/${taskId}`, taskForm) as Observable <GenericResponse<any>>;
+  }
 }
