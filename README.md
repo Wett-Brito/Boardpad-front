@@ -31,6 +31,10 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 
 Or you can run command ng serve --o and the terminal will start your browser in the correct url automatically.
 
+### Docker way
+
+You can build the app's Docker image by using docker build . -t frontend:latest or you can start the project's environment by using the `docker-compose -p [CONTAINER_NAME] up -d` (please access the [BoardPad-Back](https://github.com/GustavoReinaldi/BoardPad-Back) source code to build the backend image before of run the docker compose command).
+
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
