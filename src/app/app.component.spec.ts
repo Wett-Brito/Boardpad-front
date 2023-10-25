@@ -20,16 +20,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'Boardpad-front'`, () => {
+  it(`should have as title 'boardpad-front'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('Boardpad-front');
+    expect(app.title).toEqual('boardpad-front');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('Boardpad-front app is running!');
+    expect(compiled.querySelector('.content span')?.textContent).toContain('boardpad-front app is running!');
   });
 });
