@@ -46,3 +46,24 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 ## Running end-to-end tests
 
 Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+
+## System Interface
+
+### Create board
+To create a Board, all that you have to do is type the board name in text field and click on the "Create" button.
+
+![Create board GIF](https://github.com/GustavoReinaldi/Boardpad-front/blob/develop/src/assets/gifs/Boardpad-Create-Board.gif)
+
+### Create status column
+To create a status column you have to click on the "+" button. You can edit the status name by clicking on the status name and type your custom name.
+
+![Create status column GIF](https://github.com/GustavoReinaldi/Boardpad-front/blob/develop/src/assets/gifs/Create-status-column.gif)
+
+### Create tasks
+To create a task you have to click on "+ New" button, type the task details and click in the "create" button.
+
+![Create task GIF](https://github.com/GustavoReinaldi/Boardpad-front/blob/develop/src/assets/gifs/Create-task.gif)
+
+Resources of update and deletion can be made by clicking on their respective buttons.
+
+
